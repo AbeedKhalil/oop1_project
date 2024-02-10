@@ -1,0 +1,18 @@
+﻿set(MAX_LEVELS 3)  
+
+foreach(level RANGE 1 ${MAX_LEVELS})
+    configure_file("Levels/Level${level}.txt" "${CMAKE_BINARY_DIR}/Level${level}.txt" COPYONLY)
+endforeach()
+
+configure_file ("Textures/TileSheet.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/Wall.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/Mouse.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/SmartCat.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/StupidCat.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/Cheese.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/Door.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/Key.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/GiftRemoveCat.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/GiftAddTime.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/Heart.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Regular.ttf" ${CMAKE_BINARY_DIR} COPYONLY)
