@@ -14,13 +14,32 @@ void Game::initObjects()
 	objects.push_back(std::make_unique<Cat>());
 }
 
+void Game::initTileSheet()
+{
+	if (!this->tileSheet.loadFromFile("TileSheet.png"))
+	{
+		std::cout << "ERROR::GAME::TILESHEET::INITTEXTURE::could not load texture file.\n";
+	}
+}
+
+void Game::initMap()
+{
+	this->map = new Map(60, 60, &this->tileSheet, 60);
+	this->map->addTile(0, 0);
+}
+
 Game::Game()
 {
 	this->initWindow();
+	this->initTileSheet();
 	this->initObjects();
+	this->initMap();
 }
 
-Game::~Game() {}
+Game::~Game()
+{
+	delete this->map;
+}
 
 void Game::run()
 {
@@ -71,6 +90,16 @@ void Game::updateInput()
 
 }
 
+void Game::updateMap()
+{
+	this->map->update();
+}
+
+void Game::renderMap()
+{
+	this->map->render(*this->window);
+}
+
 void Game::update() {
 	updatePollEvent();
 	updateInput();
@@ -78,11 +107,13 @@ void Game::update() {
 	for (auto& obj : objects) {
 		obj->update();
 	}
+
+	this->updateMap();
 }
 
 void Game::render() {
 	window->clear();
-	levelMap.render(*window); // Render the map first
+	this->renderMap();
 	// Then render all objects
 	for (auto& obj : objects) {
 		obj->render(*window);

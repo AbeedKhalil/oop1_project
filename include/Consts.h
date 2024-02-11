@@ -5,8 +5,10 @@
 #include <vector>
 #include <string>
 #include <conio.h>
-#include <cstdlib>  
+#include <cstdlib>
+#include <limits>
 #include <ctime>
+#include <SFML/Graphics.hpp>
 
 
 #define MAX_LEVELS	 4
