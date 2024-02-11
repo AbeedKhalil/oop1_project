@@ -1,35 +1,23 @@
 #pragma once
 
-#include "Consts.h"
-#include <iostream>
-#include <fstream>
-#include <filesystem> // For checking file existence
-#include <SFML/Graphics.hpp>
-#include <vector>
+#include "Tile.h"
 
 class Map
 {
 private:
-    int m_level;
-    std::vector<std::vector<char>> m_map;
-    std::vector<std::vector<sf::Sprite>> tiles; // 2D vector for map tiles
-    sf::Texture tileTexture; // Texture for the tiles
-
-    void initTiles(); // Initialize the tiles based on the level data
-
-    sf::Texture wallTexture;
-    sf::Texture mouseTexture;
+    std::vector< std::vector<Tile*> > tiles;
+    sf::Texture* tileSheet;
+    unsigned tileSize;
 
 public:
     Map();
+    Map(unsigned width, unsigned height, sf::Texture* tileSheet, unsigned tileSize);
     ~Map();
 
-    void preloadTextures();
+    // functions
+    void addTile(unsigned x, unsigned y);
+    void removeTile(unsigned x, unsigned y);
 
-    void loadLevel();
+    void update();
     void render(sf::RenderTarget& target);
-
-    void updateLevel();
-
-    bool readLevelFromFile(const int level);
 };
