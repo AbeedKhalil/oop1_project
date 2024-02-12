@@ -2,16 +2,19 @@
 
 void Game::initWindow()
 {
-	this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(1280, 720), "Mouse VS Cats", sf::Style::Close | sf::Style::Titlebar);
+	this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(960, 840), "Mouse VS Cats", sf::Style::Close | sf::Style::Titlebar);
 	this->window->setFramerateLimit(60);
 	this->window->setVerticalSyncEnabled(false);
+}
+
+void Game::initMenu()
+{
+	this->menu = new Menu();
 }
 
 
 void Game::initObjects()
 {
-	objects.push_back(std::make_unique<Mouse>());
-	objects.push_back(std::make_unique<Cat>());
 }
 
 void Game::initTileSheet()
@@ -20,12 +23,8 @@ void Game::initTileSheet()
 	{
 		std::cout << "ERROR::GAME::TILESHEET::INITTEXTURE::could not load texture file.\n";
 	}
-}
 
-void Game::initMap()
-{
-	this->map = new Map(60, 60, &this->tileSheet, 60);
-	this->map->addTile(0, 0);
+	sprite.setTexture(this->tileSheet);
 }
 
 Game::Game()
@@ -33,12 +32,16 @@ Game::Game()
 	this->initWindow();
 	this->initTileSheet();
 	this->initObjects();
-	this->initMap();
+	this->initMenu();
+	this->level = new Level(*this->window);
+	this->level->loadFromFile();
+
 }
 
 Game::~Game()
 {
-	delete this->map;
+	delete this->menu;
+	delete this->level;
 }
 
 void Game::run()
@@ -90,33 +93,50 @@ void Game::updateInput()
 
 }
 
-void Game::updateMap()
-{
-	this->map->update();
-}
-
-void Game::renderMap()
-{
-	this->map->render(*this->window);
-}
-
 void Game::update() {
 	updatePollEvent();
 	updateInput();
-	// Update all objects
+
+	// Temporary pointers for mouse and cat
+	Mouse* mouse = nullptr;
+	Cat* cat = nullptr;
+
+	// Iterate through all objects to find the mouse and the cat
+	for (auto& obj : objects) {
+		if (!mouse) mouse = dynamic_cast<Mouse*>(obj.get());
+		if (!cat) cat = dynamic_cast<Cat*>(obj.get());
+
+		// Break early if both are found
+		if (mouse && cat) break;
+	}
+
+	// If both mouse and cat are found, make the cat follow the mouse
+	if (mouse && cat) {
+		sf::Vector2f mousePos = mouse->getPosition();
+		sf::Vector2f catPos = cat->getPosition();
+
+		// Calculate the vector from cat to mouse and normalize it
+		sf::Vector2f direction = mousePos - catPos;
+		float magnitude = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+		if (magnitude > 0) { // Avoid division by zero
+			direction.x /= magnitude;
+			direction.y /= magnitude;
+		}
+
+		// Update cat's position to follow the mouse, adjusting speed as necessary
+		cat->move(direction.x * cat->getMovementSpeed(), direction.y * cat->getMovementSpeed());
+	}
+
+	// Update logic for all objects
 	for (auto& obj : objects) {
 		obj->update();
 	}
-
-	this->updateMap();
 }
 
 void Game::render() {
 	window->clear();
-	this->renderMap();
-	// Then render all objects
-	for (auto& obj : objects) {
-		obj->render(*window);
-	}
+	window->draw(sprite);
+	this->level->render();
+	this->menu->draw(*this->window);
 	window->display();
 }

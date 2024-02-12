@@ -2,7 +2,7 @@
 
 Mouse::Mouse()
 {
-    this->movementSpeed = 5.f;
+    this->movementSpeed = 3.f;
     initTexture();
     initSprite();
 }

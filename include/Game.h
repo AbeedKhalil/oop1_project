@@ -1,22 +1,23 @@
 #pragma once
 
-#include "Map.h"
-#include "Mouse.h"
-#include "Cat.h"
+#include "Menu.h"
+#include "Level.h"
 
 class Game 
 {
 private:
     std::unique_ptr<sf::RenderWindow> window;
     std::vector<std::unique_ptr<Objects>> objects;
+    sf::Sprite sprite;
     sf::Texture tileSheet;
-    Map *map;
+    Menu* menu;
+    Level* level;
 
     // private functions
     void initWindow();
+    void initMenu();
     void initObjects();
     void initTileSheet();
-    void initMap();
 
 public:
     Game();
@@ -24,8 +25,6 @@ public:
     void run();
     void updatePollEvent();
     void updateInput();
-    void updateMap();
-    void renderMap();
     void update();
     void render();
 };

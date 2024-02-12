@@ -11,6 +11,9 @@ public:
 
     // Functions
     virtual void move(const float dirX, const float dirY);
+    sf::Vector2f getPosition() const;
+    void setPosition(float posX, float posY);
+    float getMovementSpeed() const;
     virtual void update();
     void render(sf::RenderTarget& target) const;
 

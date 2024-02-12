@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <conio.h>
@@ -20,3 +21,5 @@
 #define MOUSE		'%'
 #define CAT			'^'
 #define PASS		' '
+#define TILE_SIZE	60
+

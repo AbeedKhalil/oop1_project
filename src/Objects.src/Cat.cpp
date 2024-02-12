@@ -2,7 +2,7 @@
 
 Cat::Cat()
 {
-    this->movementSpeed = 5.f;
+    this->movementSpeed = 1.f;
     initTexture();
     initSprite();
 }
