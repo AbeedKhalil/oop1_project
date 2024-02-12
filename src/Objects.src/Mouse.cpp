@@ -1,6 +1,6 @@
 #include "Mouse.h"
 
-Mouse::Mouse() : Objects(0.f, 100.f)
+Mouse::Mouse()
 {
     this->movementSpeed = 3.f;
     initTexture();

@@ -1,6 +1,6 @@
 #include "Cat.h"
 
-Cat::Cat() : Objects(600.f, 200.f)
+Cat::Cat()
 {
     this->movementSpeed = 1.f;
     initTexture();

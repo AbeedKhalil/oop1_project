@@ -2,7 +2,7 @@
 
 void Game::initWindow()
 {
-	this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(1280, 720), "Mouse VS Cats", sf::Style::Close | sf::Style::Titlebar);
+	this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(960, 840), "Mouse VS Cats", sf::Style::Close | sf::Style::Titlebar);
 	this->window->setFramerateLimit(60);
 	this->window->setVerticalSyncEnabled(false);
 }
@@ -15,8 +15,6 @@ void Game::initMenu()
 
 void Game::initObjects()
 {
-	objects.push_back(std::make_unique<Mouse>());
-	objects.push_back(std::make_unique<Cat>());
 }
 
 void Game::initTileSheet()
@@ -29,24 +27,21 @@ void Game::initTileSheet()
 	sprite.setTexture(this->tileSheet);
 }
 
-void Game::initMap()
-{
-	this->map = new Map(60, 60, &this->tileSheet, 60);
-}
-
 Game::Game()
 {
 	this->initWindow();
 	this->initTileSheet();
 	this->initObjects();
-	this->initMap();
 	this->initMenu();
+	this->level = new Level(*this->window);
+	this->level->loadFromFile();
+
 }
 
 Game::~Game()
 {
-	delete this->map;
 	delete this->menu;
+	delete this->level;
 }
 
 void Game::run()
@@ -98,16 +93,6 @@ void Game::updateInput()
 
 }
 
-void Game::updateMap()
-{
-	this->map->update();
-}
-
-void Game::renderMap()
-{
-	this->map->render(*this->window);
-}
-
 void Game::update() {
 	updatePollEvent();
 	updateInput();
@@ -146,19 +131,12 @@ void Game::update() {
 	for (auto& obj : objects) {
 		obj->update();
 	}
-
-	this->updateMap();
 }
-
 
 void Game::render() {
 	window->clear();
 	window->draw(sprite);
+	this->level->render();
 	this->menu->draw(*this->window);
-	this->renderMap();
-	// Then render all objects
-	for (auto& obj : objects) {
-		obj->render(*window);
-	}
 	window->display();
 }

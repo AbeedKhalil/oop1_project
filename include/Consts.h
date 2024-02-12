@@ -21,3 +21,5 @@
 #define MOUSE		'%'
 #define CAT			'^'
 #define PASS		' '
+#define TILE_SIZE	60
+
