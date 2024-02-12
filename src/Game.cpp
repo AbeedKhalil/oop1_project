@@ -7,6 +7,11 @@ void Game::initWindow()
 	this->window->setVerticalSyncEnabled(false);
 }
 
+void Game::initMenu()
+{
+	this->menu = new Menu();
+}
+
 
 void Game::initObjects()
 {
@@ -20,12 +25,13 @@ void Game::initTileSheet()
 	{
 		std::cout << "ERROR::GAME::TILESHEET::INITTEXTURE::could not load texture file.\n";
 	}
+
+	sprite.setTexture(this->tileSheet);
 }
 
 void Game::initMap()
 {
 	this->map = new Map(60, 60, &this->tileSheet, 60);
-	this->map->addTile(0, 0);
 }
 
 Game::Game()
@@ -34,11 +40,13 @@ Game::Game()
 	this->initTileSheet();
 	this->initObjects();
 	this->initMap();
+	this->initMenu();
 }
 
 Game::~Game()
 {
 	delete this->map;
+	delete this->menu;
 }
 
 void Game::run()
@@ -103,7 +111,38 @@ void Game::renderMap()
 void Game::update() {
 	updatePollEvent();
 	updateInput();
-	// Update all objects
+
+	// Temporary pointers for mouse and cat
+	Mouse* mouse = nullptr;
+	Cat* cat = nullptr;
+
+	// Iterate through all objects to find the mouse and the cat
+	for (auto& obj : objects) {
+		if (!mouse) mouse = dynamic_cast<Mouse*>(obj.get());
+		if (!cat) cat = dynamic_cast<Cat*>(obj.get());
+
+		// Break early if both are found
+		if (mouse && cat) break;
+	}
+
+	// If both mouse and cat are found, make the cat follow the mouse
+	if (mouse && cat) {
+		sf::Vector2f mousePos = mouse->getPosition();
+		sf::Vector2f catPos = cat->getPosition();
+
+		// Calculate the vector from cat to mouse and normalize it
+		sf::Vector2f direction = mousePos - catPos;
+		float magnitude = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+		if (magnitude > 0) { // Avoid division by zero
+			direction.x /= magnitude;
+			direction.y /= magnitude;
+		}
+
+		// Update cat's position to follow the mouse, adjusting speed as necessary
+		cat->move(direction.x * cat->getMovementSpeed(), direction.y * cat->getMovementSpeed());
+	}
+
+	// Update logic for all objects
 	for (auto& obj : objects) {
 		obj->update();
 	}
@@ -111,8 +150,11 @@ void Game::update() {
 	this->updateMap();
 }
 
+
 void Game::render() {
 	window->clear();
+	window->draw(sprite);
+	this->menu->draw(*this->window);
 	this->renderMap();
 	// Then render all objects
 	for (auto& obj : objects) {

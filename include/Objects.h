@@ -6,11 +6,13 @@
 class Objects {
 public:
     // Constructor and Destructor
-    Objects();
+    Objects(float posX, float posY);
     virtual ~Objects();
 
     // Functions
     virtual void move(const float dirX, const float dirY);
+    sf::Vector2f getPosition() const;
+    float getMovementSpeed() const;
     virtual void update();
     void render(sf::RenderTarget& target) const;
 

@@ -1,8 +1,8 @@
 #include "Cat.h"
 
-Cat::Cat()
+Cat::Cat() : Objects(600.f, 200.f)
 {
-    this->movementSpeed = 5.f;
+    this->movementSpeed = 1.f;
     initTexture();
     initSprite();
 }

@@ -12,5 +12,5 @@ public:
 	Tile(sf::Texture* textureSheet, sf::IntRect textureRect, bool damaging = false);
 	const sf::FloatRect getGloubalBounds() const;
 	void update();
-	void render(sf::RenderTarget& target);
+	void render(sf::RenderTarget& target) const;
 };

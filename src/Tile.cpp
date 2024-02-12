@@ -15,7 +15,7 @@ void Tile::update()
 {
 }
 
-void Tile::render(sf::RenderTarget& target)
+void Tile::render(sf::RenderTarget& target) const
 {
 	target.draw(this->sprite);
 }

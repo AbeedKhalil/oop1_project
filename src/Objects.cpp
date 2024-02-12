@@ -1,8 +1,9 @@
 #include "Objects.h"
 
-Objects::Objects()
+Objects::Objects(float posX, float posY)
 {
     this->movementSpeed = 0.f;
+    this->sprite.setPosition(posX, posY);
 }
 
 Objects::~Objects()
@@ -12,6 +13,16 @@ Objects::~Objects()
 void Objects::move(const float dirX, const float dirY) 
 {
     this->sprite.move(this->movementSpeed * dirX, this->movementSpeed * dirY);
+}
+
+sf::Vector2f Objects::getPosition() const
+{
+    return this->sprite.getPosition();
+}
+
+float Objects::getMovementSpeed() const
+{
+    return this->movementSpeed;
 }
 
 void Objects::update() 
