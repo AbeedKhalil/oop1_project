@@ -20,6 +20,7 @@ private:
 public:
     Level(sf::RenderWindow& window);
     ~Level();
+    std::vector<Objects*> getRawObjectPointers() const;
     void loadFromFile();
     void render();
 };

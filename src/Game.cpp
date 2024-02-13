@@ -29,6 +29,8 @@ Game::Game()
 	this->initMenu();
 	this->level = new Level(*this->window);
 	this->level->loadFromFile();
+	std::vector<Objects*> rawObjects = this->level->getRawObjectPointers();
+	this->receiveObjectsFromLevel(rawObjects);
 }
 
 Game::~Game()
@@ -45,6 +47,13 @@ void Game::run()
 		this->render();
 	}
 }
+
+void Game::receiveObjectsFromLevel(const std::vector<Objects*>& rawObjects) {
+	for (auto obj : rawObjects) {
+		objects.push_back(std::unique_ptr<Objects>(obj));
+	}
+}
+
 
 void Game::updatePollEvent()
 {

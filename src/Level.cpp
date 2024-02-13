@@ -4,6 +4,19 @@ Level::Level(sf::RenderWindow& window) : window(window) { this->tileSize = TILE_
 
 Level::~Level() {}
 
+std::vector<Objects*> Level::getRawObjectPointers() const {
+    std::vector<Objects*> flatObjects;
+    for (const auto& row : map) {
+        for (auto obj : row) {
+            if (obj != nullptr) {
+                flatObjects.push_back(obj);
+            }
+        }
+    }
+    return flatObjects;
+}
+
+
 void Level::loadFromFile() {
     std::ifstream file("Level1.txt");
     if (!file.is_open()) {
