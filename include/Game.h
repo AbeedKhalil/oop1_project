@@ -3,7 +3,7 @@
 #include "Menu.h"
 #include "Level.h"
 
-class Game 
+class Game
 {
 private:
     std::unique_ptr<sf::RenderWindow> window;
@@ -23,6 +23,7 @@ public:
     Game();
     virtual ~Game();
     void run();
+    void receiveObjectsFromLevel(const std::vector<Objects*>& rawObjects);
     void updatePollEvent();
     void updateInput();
     void update();
