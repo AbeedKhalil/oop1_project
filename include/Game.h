@@ -12,11 +12,11 @@ private:
     sf::Texture tileSheet;
     Menu* menu;
     Level* level;
+    bool restartGame = false;
 
     // private functions
     void initWindow();
     void initMenu();
-    void initObjects();
     void initTileSheet();
 
 public:

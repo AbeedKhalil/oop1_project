@@ -12,11 +12,6 @@ void Game::initMenu()
 	this->menu = new Menu();
 }
 
-
-void Game::initObjects()
-{
-}
-
 void Game::initTileSheet()
 {
 	if (!this->tileSheet.loadFromFile("TileSheet.png"))
@@ -31,11 +26,9 @@ Game::Game()
 {
 	this->initWindow();
 	this->initTileSheet();
-	this->initObjects();
 	this->initMenu();
 	this->level = new Level(*this->window);
 	this->level->loadFromFile();
-
 }
 
 Game::~Game()
@@ -58,9 +51,20 @@ void Game::updatePollEvent()
 	sf::Event ev;
 	while (this->window->pollEvent(ev))
 	{
-		if (ev.Event::type == sf::Event::Closed)
+		switch (ev.type)
 		{
+		case sf::Event::Closed:
 			this->window->close();
+			break;
+
+		case sf::Event::KeyPressed:
+			if (ev.key.code == sf::Keyboard::E)
+			{
+				this->window->close();
+			}
+			break;
+
+			// other cases...
 		}
 	}
 }
@@ -96,7 +100,12 @@ void Game::updateInput()
 void Game::update() {
 	updatePollEvent();
 	updateInput();
-
+	this->menu->update(*this->window, restartGame);
+	if (restartGame) {
+		Game game;
+		game.run();
+		restartGame = false; // Reset the flag
+	}
 	// Temporary pointers for mouse and cat
 	Mouse* mouse = nullptr;
 	Cat* cat = nullptr;
