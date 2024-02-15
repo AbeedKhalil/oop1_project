@@ -1,20 +1,15 @@
 #include "Cat.h"
 
-Cat::Cat()
+Cat::Cat() : Objects(2.f, 45.f) // Initialize base class members with constructor initializer list
 {
-    this->movementSpeed = 1.f;
     initTexture();
     initSprite();
 }
 
-Cat::~Cat()
-{
-}
-
 void Cat::initTexture()
 {
-    if (!this->texture.loadFromFile("SmartCat.png"))
-    {
-        std::cout << "ERROR::CAT::INITTEXTURE::could not load texture file.\n";
+    if (!texture.loadFromFile("SmartCat.png")) {
+        // Error handling
+        std::cerr << "ERROR::CAT::Could not load texture file." << std::endl;
     }
 }

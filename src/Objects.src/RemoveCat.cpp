@@ -6,11 +6,9 @@ RemoveCat::RemoveCat()
     initSprite();
 }
 
-RemoveCat::~RemoveCat() {
-}
-
 void RemoveCat::initTexture() {
     if (!this->texture.loadFromFile("GiftRemoveCat.png")) {
-        std::cout << "ERROR::RemoveCat::INITTEXTURE::Could not load texture file." << std::endl;
+        // Error handling
+        std::cerr << "ERROR::RemoveCat::INITTEXTURE::Could not load texture file." << std::endl;
     }
 }

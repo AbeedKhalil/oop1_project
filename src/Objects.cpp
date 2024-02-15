@@ -1,52 +1,47 @@
 #include "Objects.h"
 
-Objects::Objects()
-{
-    this->movementSpeed = 0.f;
+Objects::Objects(float movementSpeed, float size)
+    : movementSpeed(movementSpeed), size(size) {}
+
+void Objects::move(float dirX, float dirY) {
+    sprite.move(movementSpeed * dirX, movementSpeed * dirY);
 }
 
-Objects::~Objects() {}
-
-void Objects::move(const float dirX, const float dirY) 
-{
-    this->sprite.move(this->movementSpeed * dirX, this->movementSpeed * dirY);
+sf::Vector2f Objects::getPosition() const {
+    return sprite.getPosition();
 }
 
-sf::Vector2f Objects::getPosition() const
-{
-    return this->sprite.getPosition();
+sf::Sprite Objects::getSprite() const {
+    return sprite;
 }
 
-void Objects::setPosition(float posX, float posY)
-{
-    this->sprite.setPosition(posX, posY);
+sf::FloatRect Objects::getBounds() const {
+    return sprite.getGlobalBounds();
 }
 
-float Objects::getMovementSpeed() const
-{
-    return this->movementSpeed;
+void Objects::setPosition(float posX, float posY) {
+    sprite.setPosition(posX, posY);
 }
 
-void Objects::update() 
-{
+float Objects::getMovementSpeed() const {
+    return movementSpeed;
 }
 
-void Objects::render(sf::RenderTarget& target) const
-{
-    target.draw(this->sprite);
+void Objects::update() {
+    // Empty implementation, meant to be overridden
 }
 
-void Objects::initSprite()
-{
-    this->sprite.setTexture(this->texture);
+void Objects::render(sf::RenderTarget& target) const {
+    target.draw(sprite);
+}
 
-    // Get the original size of the texture
-    sf::Vector2u textureSize = this->texture.getSize();
+void Objects::initSprite() {
+    sprite.setTexture(texture);
 
-    // Calculate the scale factors
-    float scaleX = 60.f / textureSize.x; // Desired width / original width
-    float scaleY = 60.f / textureSize.y; // Desired height / original height
+    // Calculate scale factors to adjust the sprite size
+    sf::Vector2u textureSize = texture.getSize();
+    float scaleX = size / static_cast<float>(textureSize.x);
+    float scaleY = size / static_cast<float>(textureSize.y);
 
-    // Set the sprite's scale to adjust its size
-    this->sprite.setScale(scaleX, scaleY);
+    sprite.setScale(scaleX, scaleY);
 }

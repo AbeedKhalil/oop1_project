@@ -10,17 +10,16 @@
 #include "Key.h"
 #include "Cheese.h"
 
-class Level
-{
+class Level {
 private:
     sf::RenderWindow& window;
-    std::vector<std::vector<Objects*>> map;
+    std::vector<std::vector<std::unique_ptr<Objects>>> map;
     int tileSize;
 
 public:
     Level(sf::RenderWindow& window);
-    ~Level();
-    std::vector<Objects*> getRawObjectPointers() const;
+    ~Level() = default; // Compiler-generated destructor is fine if we use smart pointers
     void loadFromFile();
+    std::vector<Objects*> getRawObjectPointers() const;
     void render();
 };
