@@ -5,6 +5,7 @@ foreach(level RANGE 1 ${MAX_LEVELS})
 endforeach()
 
 configure_file ("Textures/TileSheet.png" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Textures/MenuBackground.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Textures/Wall.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Textures/Mouse.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Textures/SmartCat.png" ${CMAKE_BINARY_DIR} COPYONLY)

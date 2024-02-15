@@ -1,24 +1,28 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <vector>
-#include <string>
+#include "Consts.h"
+
+struct MenuItem {
+    sf::RectangleShape button;
+    sf::Text text;
+};
 
 class Menu {
 private:
     int selectedItemIndex;
     sf::Font font;
-    std::vector<sf::Text> menuTexts;
-    std::vector<sf::RectangleShape> menuButtons;
+    std::vector<MenuItem> menuItems;
+    static const int characterSize = 33;
+    static const sf::Color normalColor;
+    static const sf::Color hoverColor;
+    static const sf::Color textColor;
 
 public:
     Menu();
-
-    void showHelpWindow() const;
+    void showHelpWindow(sf::RenderWindow& window, GameState& gameState) const;
     void draw(sf::RenderWindow& window);
-    //void MoveRight();
-    //void MoveLeft();
-    void update(sf::RenderWindow& window, bool& reset);
+
+    void update(sf::RenderWindow& window, GameState& gameState);
+
     int GetPressedItem() const { return selectedItemIndex; }
 };

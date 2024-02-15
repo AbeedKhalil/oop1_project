@@ -4,14 +4,21 @@
 #include <iostream>
 
 class Objects {
+private:
+    // Private methods or members can be added here
+
 public:
-    // Constructor and Destructor
-    Objects();
-    virtual ~Objects();
+    // Constructor
+    Objects(float movementSpeed = 0.f, float size = 35.f);
+
+    // Virtual Destructor
+    virtual ~Objects() = default;
 
     // Functions
-    virtual void move(const float dirX, const float dirY);
+    virtual void move(float dirX, float dirY);
     sf::Vector2f getPosition() const;
+    sf::Sprite getSprite() const;
+    sf::FloatRect getBounds() const;
     void setPosition(float posX, float posY);
     float getMovementSpeed() const;
     virtual void update();
@@ -21,6 +28,7 @@ protected:
     sf::Sprite sprite;
     sf::Texture texture;
     float movementSpeed;
+    float size;
 
     // Initialization functions
     virtual void initTexture() = 0;

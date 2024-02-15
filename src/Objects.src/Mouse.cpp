@@ -1,20 +1,16 @@
 #include "Mouse.h"
 
-Mouse::Mouse()
+Mouse::Mouse() : Objects(2.f, 45.f) // Initialize base class members with constructor initializer list
 {
-    this->movementSpeed = 3.f;
     initTexture();
     initSprite();
-}
-
-Mouse::~Mouse()
-{
 }
 
 void Mouse::initTexture()
 {
     if (!this->texture.loadFromFile("Mouse.png"))
     {
-        std::cout << "ERROR::MOUSE::INITTEXTURE::could not load texture file.\n";
+        // Error handling
+        std::cerr << "ERROR::MOUSE::INITTEXTURE::could not load texture file.\n";
     }
 }
