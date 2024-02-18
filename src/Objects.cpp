@@ -1,30 +1,40 @@
 #include "Objects.h"
 
 Objects::Objects(float movementSpeed, float size)
-    : movementSpeed(movementSpeed), size(size) {}
+    : m_movementSpeed(movementSpeed), m_size(size), m_visible(true) {}
 
 void Objects::move(float dirX, float dirY) {
-    sprite.move(movementSpeed * dirX, movementSpeed * dirY);
+    m_sprite.move(m_movementSpeed * dirX, m_movementSpeed * dirY);
 }
 
 sf::Vector2f Objects::getPosition() const {
-    return sprite.getPosition();
+    return m_sprite.getPosition();
 }
 
 sf::Sprite Objects::getSprite() const {
-    return sprite;
+    return m_sprite;
 }
 
 sf::FloatRect Objects::getBounds() const {
-    return sprite.getGlobalBounds();
+    return m_sprite.getGlobalBounds();
 }
 
 void Objects::setPosition(float posX, float posY) {
-    sprite.setPosition(posX, posY);
+    m_sprite.setPosition(posX, posY);
 }
 
 float Objects::getMovementSpeed() const {
-    return movementSpeed;
+    return m_movementSpeed;
+}
+
+bool Objects::isVisible() const
+{
+    return m_visible;
+}
+
+void Objects::setVisible(bool Visible)
+{
+    this->m_visible = Visible;
 }
 
 void Objects::update() {
@@ -32,16 +42,16 @@ void Objects::update() {
 }
 
 void Objects::render(sf::RenderTarget& target) const {
-    target.draw(sprite);
+    target.draw(m_sprite);
 }
 
 void Objects::initSprite() {
-    sprite.setTexture(texture);
+    m_sprite.setTexture(m_texture);
 
     // Calculate scale factors to adjust the sprite size
-    sf::Vector2u textureSize = texture.getSize();
-    float scaleX = size / static_cast<float>(textureSize.x);
-    float scaleY = size / static_cast<float>(textureSize.y);
+    sf::Vector2u textureSize = m_texture.getSize();
+    float scaleX = m_size / static_cast<float>(textureSize.x);
+    float scaleY = m_size / static_cast<float>(textureSize.y);
 
-    sprite.setScale(scaleX, scaleY);
+    m_sprite.setScale(scaleX, scaleY);
 }

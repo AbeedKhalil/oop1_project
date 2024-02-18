@@ -8,7 +8,7 @@ Mouse::Mouse() : Objects(2.f, 45.f) // Initialize base class members with constr
 
 void Mouse::initTexture()
 {
-    if (!this->texture.loadFromFile("Mouse.png"))
+    if (!this->m_texture.loadFromFile("Mouse.png"))
     {
         // Error handling
         std::cerr << "ERROR::MOUSE::INITTEXTURE::could not load texture file.\n";

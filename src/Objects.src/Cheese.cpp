@@ -7,7 +7,7 @@ Cheese::Cheese()
 }
 
 void Cheese::initTexture() {
-    if (!this->texture.loadFromFile("Cheese.png")) {
+    if (!this->m_texture.loadFromFile("Cheese.png")) {
         // Error handling
         std::cerr << "ERROR::CHEESE::INITTEXTURE::Could not load texture file." << std::endl;
     }

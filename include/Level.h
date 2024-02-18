@@ -12,14 +12,15 @@
 
 class Level {
 private:
-    sf::RenderWindow& window;
-    std::vector<std::vector<std::unique_ptr<Objects>>> map;
-    int tileSize;
+    sf::RenderWindow& m_window;
+    std::vector<std::vector<std::unique_ptr<Objects>>> m_map;
+    int m_tileSize, m_level;
 
 public:
     Level(sf::RenderWindow& window);
     ~Level() = default; // Compiler-generated destructor is fine if we use smart pointers
     void loadFromFile();
+    void updateLevel();
     std::vector<Objects*> getRawObjectPointers() const;
     void render();
 };

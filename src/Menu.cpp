@@ -1,13 +1,13 @@
 #include "Menu.h"
 
 // Define static const colors
-const sf::Color Menu::normalColor = sf::Color{ 200, 200, 200, 150 };
-const sf::Color Menu::hoverColor = sf::Color{ 200, 200, 200, 255 };
-const sf::Color Menu::textColor = sf::Color::Black;
+const sf::Color Menu::m_normalColor = sf::Color{ 200, 200, 200, 150 };
+const sf::Color Menu::m_hoverColor = sf::Color{ 200, 200, 200, 255 };
+const sf::Color Menu::m_textColor = sf::Color::Black;
 
 
-Menu::Menu() : selectedItemIndex(0) {
-    if (!font.loadFromFile("Regular.ttf")) {
+Menu::Menu() : m_selectedItemIndex(0) {
+    if (!m_font.loadFromFile("Regular.ttf")) {
         std::cerr << "ERROR::MENU::Could not load font file." << std::endl;
     }
 
@@ -19,15 +19,15 @@ Menu::Menu() : selectedItemIndex(0) {
         MenuItem item;
         item.button.setSize(sf::Vector2f(buttonWidth, buttonHeight));
         item.button.setPosition(x, y);
-        item.button.setFillColor(normalColor);
+        item.button.setFillColor(m_normalColor);
 
-        item.text.setFont(font);
+        item.text.setFont(m_font);
         item.text.setString(label);
-        item.text.setCharacterSize(characterSize);
-        item.text.setFillColor(textColor);
+        item.text.setCharacterSize(m_characterSize);
+        item.text.setFillColor(m_textColor);
         item.text.setPosition(x + 30.f, y + 25); // Slight offset for better visual alignment
 
-        menuItems.push_back(item);
+        m_menuItems.push_back(item);
         y += buttonHeight + 20; // Increment y position for next button
     }
 }
@@ -37,7 +37,7 @@ void Menu::showHelpWindow(sf::RenderWindow& window, GameState& gameState) const 
 
     // Help text setup...
     sf::Text helpText;
-    helpText.setFont(font);
+    helpText.setFont(m_font);
     helpText.setString("Game Instructions:\n- Use arrow keys to move\n- Press 'E' to exit\n\nGame Objective:\n- Collect all cheese\n- Avoid cats.\n");
     helpText.setCharacterSize(24);
     helpText.setFillColor(sf::Color::White);
@@ -47,11 +47,11 @@ void Menu::showHelpWindow(sf::RenderWindow& window, GameState& gameState) const 
     // Back button setup
     sf::RectangleShape backButton(sf::Vector2f(50, 25));
     backButton.setPosition(0, 0); // Top left corner
-    backButton.setFillColor(normalColor);
+    backButton.setFillColor(m_normalColor);
     window.draw(backButton);
 
     sf::Text backButtonText;
-    backButtonText.setFont(font);
+    backButtonText.setFont(m_font);
     backButtonText.setString("Back");
     backButtonText.setCharacterSize(20);
     backButtonText.setFillColor(sf::Color::Black);
@@ -60,7 +60,7 @@ void Menu::showHelpWindow(sf::RenderWindow& window, GameState& gameState) const 
 }
 
 void Menu::draw(sf::RenderWindow& window) {
-    for (const auto& item : menuItems) {
+    for (const auto& item : m_menuItems) {
         window.draw(item.button);
         window.draw(item.text);
     }
@@ -68,12 +68,12 @@ void Menu::draw(sf::RenderWindow& window) {
 void Menu::update(sf::RenderWindow& window, GameState& gameState) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-    for (size_t i = 0; i < menuItems.size(); ++i) {
-        auto& item = menuItems[i];
+    for (size_t i = 0; i < m_menuItems.size(); ++i) {
+        auto& item = m_menuItems[i];
         if (item.button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-            item.button.setFillColor(hoverColor);
+            item.button.setFillColor(m_hoverColor);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                selectedItemIndex = static_cast<int>(i);
+                m_selectedItemIndex = static_cast<int>(i);
                 switch (i) {
                 case 0:  gameState = GameState::InGame; break; // New Game
                 case 1: gameState = GameState::Help; break; // Help
@@ -82,7 +82,7 @@ void Menu::update(sf::RenderWindow& window, GameState& gameState) {
             }
         }
         else {
-            item.button.setFillColor(normalColor);
+            item.button.setFillColor(m_normalColor);
         }
     }
 

@@ -5,7 +5,7 @@
 
 class Objects {
 private:
-    // Private methods or members can be added here
+    bool m_visible;
 
 public:
     // Constructor
@@ -21,14 +21,16 @@ public:
     sf::FloatRect getBounds() const;
     void setPosition(float posX, float posY);
     float getMovementSpeed() const;
+    bool isVisible() const;
+    void setVisible(bool Visible);
     virtual void update();
     void render(sf::RenderTarget& target) const;
 
 protected:
-    sf::Sprite sprite;
-    sf::Texture texture;
-    float movementSpeed;
-    float size;
+    sf::Sprite m_sprite;
+    sf::Texture m_texture;
+    float m_movementSpeed;
+    float m_size;
 
     // Initialization functions
     virtual void initTexture() = 0;

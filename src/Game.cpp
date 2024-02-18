@@ -1,7 +1,7 @@
 #include "Game.h"
 
 // Initialize window and game components
-Game::Game() : gameState(GameState::MainMenu) {
+Game::Game() : m_gameState(GameState::MainMenu) {
 	initWindow();
 	initTileSheet();
 	initMenu();
@@ -10,55 +10,55 @@ Game::Game() : gameState(GameState::MainMenu) {
 
 // Initialize the SFML window
 void Game::initWindow() {
-	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(960, 840), "Mouse VS Cats", sf::Style::Close | sf::Style::Titlebar);
-	window->setFramerateLimit(60);
-	window->setVerticalSyncEnabled(false);
+	m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(960, 840), "Mouse VS Cats", sf::Style::Close | sf::Style::Titlebar);
+	m_window->setFramerateLimit(60);
+	m_window->setVerticalSyncEnabled(false);
 }
 
 // Initialize the menu
 void Game::initMenu() {
-	menu = std::make_unique<Menu>();
+	m_menu = std::make_unique<Menu>();
 }
 
 // Load and set up the tile sheet
 void Game::initTileSheet() {
-	if (!tileSheet.loadFromFile("TileSheet.png")) {
+	if (!m_tileSheet.loadFromFile("TileSheet.png")) {
 		std::cerr << "ERROR::GAME::Could not load texture file: TileSheet.png\n";
 	}
-	spriteGame.setTexture(tileSheet);
+	m_spriteGame.setTexture(m_tileSheet);
 
-	if (!menuSheet.loadFromFile("MenuBackground.png")) {
+	if (!m_menuSheet.loadFromFile("MenuBackground.png")) {
 		std::cerr << "ERROR::GAME::Could not load texture file: MenuBackground.png\n";
 	}
 
-	spriteMenu.setTexture(menuSheet);
+	m_spriteMenu.setTexture(m_menuSheet);
 }
 
 // Initialize the level
 void Game::initLevel() {
-	level = std::make_unique<Level>(*window);
-	level->loadFromFile();
+	m_level = std::make_unique<Level>(*m_window);
+	m_level->loadFromFile();
 	receiveObjectsFromLevel();
 }
 
 // Handle all events
 void Game::pollEvents() {
 	sf::Event event;
-	while (window->pollEvent(event)) {
+	while (m_window->pollEvent(event)) {
 		if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)) {
-			window->close();
+			m_window->close();
 		}
 	}
 }
 
 // Main game loop
 void Game::run() {
-	while (window->isOpen()) {
+	while (m_window->isOpen()) {
 		pollEvents();
 		updateInput();
 
 		// Update game state and logic only if not paused
-		if (gameState != GameState::Paused) {
+		if (m_gameState != GameState::Paused) {
 			updateGameLogic();
 		}
 
@@ -67,9 +67,9 @@ void Game::run() {
 }
 
 void Game::receiveObjectsFromLevel() {
-	auto rawObjects = level->getRawObjectPointers(); // This assumes getRawObjectPointers is correctly implemented
+	auto rawObjects = m_level->getRawObjectPointers(); // This assumes getRawObjectPointers is correctly implemented
 	for (auto* obj : rawObjects) {
-		objects.push_back(std::unique_ptr<Objects>(obj)); // Make sure this logic fits your design intentions
+		m_objects.push_back(std::unique_ptr<Objects>(obj)); // Make sure this logic fits your design intentions
 	}
 }
 
@@ -78,7 +78,7 @@ bool Game::wouldCollide(Objects* obj, float moveX, float moveY) {
 	sf::FloatRect nextPos(obj->getPosition().x + moveX, obj->getPosition().y + moveY, obj->getBounds().width, obj->getBounds().height);
 
 	// Check against all wall objects
-	for (auto& wallObj : objects) {
+	for (auto& wallObj : m_objects) {
 		Wall* wall = dynamic_cast<Wall*>(wallObj.get());
 		if (wall) {
 			sf::FloatRect wallBounds = wall->getBounds();
@@ -92,7 +92,7 @@ bool Game::wouldCollide(Objects* obj, float moveX, float moveY) {
 
 bool Game::checkCollisionWithWalls(Objects* obj, float moveX, float moveY) {
 	// Iterate over all objects to find walls
-	for (auto& wallObj : objects) {
+	for (auto& wallObj : m_objects) {
 		Wall* wall = dynamic_cast<Wall*>(wallObj.get());
 		if (wall) {
 			// Here you'd implement the actual collision check
@@ -129,7 +129,7 @@ void Game::updateInput()
 	}
 
 	// Move Mouse
-	for (auto& obj : objects) {
+	for (auto& obj : m_objects) {
 		Mouse* mouse = dynamic_cast<Mouse*>(obj.get()); // Try to cast to Mouse*
 		if (mouse) // If it's a Mouse
 		{
@@ -149,10 +149,10 @@ void Game::updateInput()
 void Game::updateGameLogic() {
 	pollEvents();
 	// Update based on game state
-	switch (gameState) {
+	switch (m_gameState) {
 	case GameState::MainMenu:
 	{
-		this->menu->update(*this->window, gameState);
+		this->m_menu->update(*this->m_window, m_gameState);
 
 		break;
 	}
@@ -164,7 +164,7 @@ void Game::updateGameLogic() {
 		Cat* cat = nullptr;
 
 		// Find the mouse and the cat
-		for (auto& obj : objects) {
+		for (auto& obj : m_objects) {
 			if (!mouse) mouse = dynamic_cast<Mouse*>(obj.get());
 			if (!cat) cat = dynamic_cast<Cat*>(obj.get());
 			if (mouse && cat) break;
@@ -195,41 +195,55 @@ void Game::updateGameLogic() {
 			}
 		}
 
+		if (mouse) {
+			for (auto& obj : m_objects) {
+				Cheese* cheese = dynamic_cast<Cheese*>(obj.get());
+				if (cheese) {
+					sf::FloatRect mouseBounds = mouse->getBounds();
+					sf::FloatRect cheeseBounds = cheese->getBounds();
+					if (mouseBounds.intersects(cheeseBounds)) {
+						// Collision detected, replace cheese with nullptr
+						obj->setVisible(false);
+					}
+				}
+			}
+		}
+
 		// Update logic for all objects
-		for (auto& obj : objects) {
+		for (auto& obj : m_objects) {
 			obj->update();
 		}
 		break;
 	}
 	case GameState::Help:
 	{
-		this->menu->update(*this->window, gameState);
+		this->m_menu->update(*this->m_window, m_gameState);
 	}
 	}
 }
 // Render all game elements
 void Game::render() {
-	window->clear();
+	m_window->clear();
 
 	// Render based on game state
-	switch (gameState) {
+	switch (m_gameState) {
 	case GameState::MainMenu:
-		window->draw(spriteMenu);
-		menu->draw(*window);
+		m_window->draw(m_spriteMenu);
+		m_menu->draw(*m_window);
 		break;
 	case GameState::InGame:
-		window->draw(spriteGame);
-		level->render();
+		m_window->draw(m_spriteGame);
+		m_level->render();
 		// Render other in-game elements here
 		break;
 	case GameState::Help:
 	{
-		menu->showHelpWindow(*window, gameState);
+		m_menu->showHelpWindow(*m_window, m_gameState);
 		break;
 	}
 	default:
 		break;
 	}
 
-	window->display();
+	m_window->display();
 }

@@ -2,13 +2,13 @@
 
 Wall::Wall()
 {
-    this->size = 60.f;
+    this->m_size = 60.f;
     initTexture();
     initSprite();
 }
 
 void Wall::initTexture() {
-    if (!this->texture.loadFromFile("Wall.png")) {
+    if (!this->m_texture.loadFromFile("Wall.png")) {
         // Error handling
         std::cerr << "ERROR::WALL::INITTEXTURE::Could not load texture file." << std::endl;
     }
