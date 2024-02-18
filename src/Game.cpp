@@ -75,7 +75,7 @@ void Game::receiveObjectsFromLevel() {
 
 bool Game::wouldCollide(Objects* obj, float moveX, float moveY) {
 	// Calculate the proposed new bounding box for obj after moving
-	sf::FloatRect nextPos(obj->getPosition().x + moveX, obj->getPosition().y + moveY, obj->getBounds().width, obj->getBounds().height);
+	sf::FloatRect nextPos(obj->getPosition().x + moveX, obj->getPosition().y + moveY, obj->getBounds().width + 1, obj->getBounds().height + 0.5);
 
 	// Check against all wall objects
 	for (auto& wallObj : m_objects) {
@@ -87,7 +87,7 @@ bool Game::wouldCollide(Objects* obj, float moveX, float moveY) {
 			}
 		}
 	}
-	return false; // No collision detected
+	return false; // No collision detected
 }
 
 bool Game::checkCollisionWithWalls(Objects* obj, float moveX, float moveY) {
