@@ -6,22 +6,22 @@
 class Game {
 private:
     // Window
-    std::unique_ptr<sf::RenderWindow> window;
+    std::unique_ptr<sf::RenderWindow> m_window;
 
     // Game State
-    GameState gameState;
+    GameState m_gameState;
 
     // Game elements
-    std::vector<std::unique_ptr<Objects>> objects;
-    sf::Sprite spriteGame;
-    sf::Sprite spriteMenu;
-    sf::Texture tileSheet;
-    sf::Texture menuSheet;
-    std::unique_ptr<Menu> menu;
-    std::unique_ptr<Level> level;
+    std::vector<std::unique_ptr<Objects>> m_objects;
+    sf::Sprite m_spriteGame;
+    sf::Sprite m_spriteMenu;
+    sf::Texture m_tileSheet;
+    sf::Texture m_menuSheet;
+    std::unique_ptr<Menu> m_menu;
+    std::unique_ptr<Level> m_level;
 
     // Game control
-    bool restartGame = false;
+    bool m_restartGame = false;
 
     // Initialization
     void initWindow();

@@ -9,13 +9,13 @@ struct MenuItem {
 
 class Menu {
 private:
-    int selectedItemIndex;
-    sf::Font font;
-    std::vector<MenuItem> menuItems;
-    static const int characterSize = 33;
-    static const sf::Color normalColor;
-    static const sf::Color hoverColor;
-    static const sf::Color textColor;
+    int m_selectedItemIndex;
+    sf::Font m_font;
+    std::vector<MenuItem> m_menuItems;
+    static const int m_characterSize = 33;
+    static const sf::Color m_normalColor;
+    static const sf::Color m_hoverColor;
+    static const sf::Color m_textColor;
 
 public:
     Menu();
@@ -24,5 +24,5 @@ public:
 
     void update(sf::RenderWindow& window, GameState& gameState);
 
-    int GetPressedItem() const { return selectedItemIndex; }
+    int GetPressedItem() const { return m_selectedItemIndex; }
 };
