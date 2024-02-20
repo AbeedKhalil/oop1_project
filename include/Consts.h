@@ -11,6 +11,9 @@
 #include <cstdlib>
 #include <limits>
 #include <ctime>
+#include <conio.h>
+#include <chrono>
+#include <thread>
 #include <SFML/Graphics.hpp>
 
 // Constants for game settings

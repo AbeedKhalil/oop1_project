@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Score.h"
 #include "Menu.h"
 #include "Level.h"
 
@@ -10,6 +11,10 @@ private:
 
     // Game State
     GameState m_gameState;
+
+    // score
+    Score m_score;
+    int m_scoreAmount;
 
     // Game elements
     std::vector<std::unique_ptr<Objects>> m_objects;
@@ -28,6 +33,7 @@ private:
     void initMenu();
     void initTileSheet();
     void initLevel();
+    void displayStartupImage();
 
     // Event handling
     void pollEvents();
@@ -35,6 +41,12 @@ private:
 
     // Game logic
     void updateGameLogic();
+    std::vector<sf::Vector2f> alternativeDirections = {
+    {0, 1},  // Down
+    {1, 0},  // Right
+    {0, -1}, // Up
+    {-1, 0}  // Left
+    };
 
     // Rendering
     void render();

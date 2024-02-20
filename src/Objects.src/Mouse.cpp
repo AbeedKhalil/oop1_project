@@ -1,6 +1,6 @@
 #include "Mouse.h"
 
-Mouse::Mouse() : Objects(2.f, 45.f) // Initialize base class members with constructor initializer list
+Mouse::Mouse() : MovingObjects(2.f) // Initialize base class members with constructor initializer list
 {
     initTexture();
     initSprite();

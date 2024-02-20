@@ -1,6 +1,6 @@
 #include "Cat.h"
 
-Cat::Cat() : Objects(2.f, 45.f) // Initialize base class members with constructor initializer list
+Cat::Cat() : MovingObjects(2.f) // Initialize base class members with constructor initializer list
 {
     initTexture();
     initSprite();
