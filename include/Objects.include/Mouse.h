@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Objects.h"
+#include "MovingObjects.h"
 
-class Mouse : public Objects
+class Mouse : public MovingObjects
 {
 public:
     Mouse();

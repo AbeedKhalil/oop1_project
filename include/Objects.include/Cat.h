@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Objects.h"
+#include "MovingObjects.h"
 
-class Cat : public Objects {
+class Cat : public MovingObjects {
 public:
     Cat();
     virtual ~Cat() = default; // Use compiler-generated destructor

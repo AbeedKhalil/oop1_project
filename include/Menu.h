@@ -11,8 +11,9 @@ class Menu {
 private:
     int m_selectedItemIndex;
     sf::Font m_font;
+    sf::Font m_menuFont;
     std::vector<MenuItem> m_menuItems;
-    static const int m_characterSize = 33;
+    static const int m_characterSize = 90;
     static const sf::Color m_normalColor;
     static const sf::Color m_hoverColor;
     static const sf::Color m_textColor;

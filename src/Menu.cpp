@@ -1,34 +1,33 @@
 #include "Menu.h"
 
 // Define static const colors
-const sf::Color Menu::m_normalColor = sf::Color{ 200, 200, 200, 150 };
-const sf::Color Menu::m_hoverColor = sf::Color{ 200, 200, 200, 255 };
-const sf::Color Menu::m_textColor = sf::Color::Black;
+const sf::Color Menu::m_normalColor = sf::Color::White;
+const sf::Color Menu::m_hoverColor = sf::Color::Yellow;
+const sf::Color Menu::m_textColor = sf::Color::White;
 
 
 Menu::Menu() : m_selectedItemIndex(0) {
     if (!m_font.loadFromFile("Regular.ttf")) {
         std::cerr << "ERROR::MENU::Could not load font file." << std::endl;
     }
+    if (!m_menuFont.loadFromFile("MainMenu.otf")) {
+        std::cerr << "ERROR::MENU::Could not load menu font file." << std::endl;
+    }
 
-    std::vector<std::string> labels = { "New Game", "      Help", "       Exit" };
-    float x = 350.f, y = 200.f; // Starting position for the first button
-    float buttonWidth = 250.f, buttonHeight = 80.f;
+    std::vector<std::string> labels = { "New Game", "    Help", "    Exit" };
+    float x = 320.f, y = 170.f; // Starting position for the first button;
 
     for (const auto& label : labels) {
         MenuItem item;
-        item.button.setSize(sf::Vector2f(buttonWidth, buttonHeight));
-        item.button.setPosition(x, y);
-        item.button.setFillColor(m_normalColor);
 
-        item.text.setFont(m_font);
+        item.text.setFont(m_menuFont);
         item.text.setString(label);
         item.text.setCharacterSize(m_characterSize);
         item.text.setFillColor(m_textColor);
-        item.text.setPosition(x + 30.f, y + 25); // Slight offset for better visual alignment
+        item.text.setPosition(x, y);
 
         m_menuItems.push_back(item);
-        y += buttonHeight + 20; // Increment y position for next button
+        y += 150;
     }
 }
 
@@ -70,8 +69,8 @@ void Menu::update(sf::RenderWindow& window, GameState& gameState) {
 
     for (size_t i = 0; i < m_menuItems.size(); ++i) {
         auto& item = m_menuItems[i];
-        if (item.button.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-            item.button.setFillColor(m_hoverColor);
+        if (item.text.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+            item.text.setFillColor(m_hoverColor);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 m_selectedItemIndex = static_cast<int>(i);
                 switch (i) {
@@ -82,7 +81,7 @@ void Menu::update(sf::RenderWindow& window, GameState& gameState) {
             }
         }
         else {
-            item.button.setFillColor(m_normalColor);
+            item.text.setFillColor(m_normalColor);
         }
     }
 

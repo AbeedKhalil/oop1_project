@@ -1,11 +1,7 @@
 #include "Objects.h"
 
-Objects::Objects(float movementSpeed, float size)
-    : m_movementSpeed(movementSpeed), m_size(size), m_visible(true) {}
-
-void Objects::move(float dirX, float dirY) {
-    m_sprite.move(m_movementSpeed * dirX, m_movementSpeed * dirY);
-}
+Objects::Objects(float size)
+    : m_size(size), m_visible(true) {}
 
 sf::Vector2f Objects::getPosition() const {
     return m_sprite.getPosition();
@@ -21,10 +17,6 @@ sf::FloatRect Objects::getBounds() const {
 
 void Objects::setPosition(float posX, float posY) {
     m_sprite.setPosition(posX, posY);
-}
-
-float Objects::getMovementSpeed() const {
-    return m_movementSpeed;
 }
 
 bool Objects::isVisible() const
