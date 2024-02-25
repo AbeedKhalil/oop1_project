@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Objects.h"
+#include "TextureManager.h"
 
 class Wall : public Objects {
 public:

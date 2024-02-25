@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Objects.h"
+#include "TextureManager.h"
 
 class RemoveCat : public Objects {
 public:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MovingObjects.h"
+#include "TextureManager.h"
 
 class Mouse : public MovingObjects
 {

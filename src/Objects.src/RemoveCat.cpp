@@ -7,8 +7,6 @@ RemoveCat::RemoveCat()
 }
 
 void RemoveCat::initTexture() {
-    if (!this->m_texture.loadFromFile("GiftRemoveCat.png")) {
-        // Error handling
-        std::cerr << "ERROR::RemoveCat::INITTEXTURE::Could not load texture file." << std::endl;
-    }
+    // Use TextureManager to get the texture instead of loading it directly
+    m_texture = TextureManager::getInstance().getTexture("GiftRemoveCat.png");
 }

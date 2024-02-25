@@ -7,9 +7,8 @@ Wall::Wall()
     initSprite();
 }
 
-void Wall::initTexture() {
-    if (!this->m_texture.loadFromFile("Wall.png")) {
-        // Error handling
-        std::cerr << "ERROR::WALL::INITTEXTURE::Could not load texture file." << std::endl;
-    }
+void Wall::initTexture() 
+{
+    // Use TextureManager to get the texture instead of loading it directly
+    m_texture = TextureManager::getInstance().getTexture("Wall.png");
 }

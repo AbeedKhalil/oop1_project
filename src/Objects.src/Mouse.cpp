@@ -26,9 +26,6 @@ void Mouse::moveMouse(std::vector<std::shared_ptr<Objects>> objects, float moveX
 
 void Mouse::initTexture()
 {
-    if (!this->m_texture.loadFromFile("Mouse.png"))
-    {
-        // Error handling
-        std::cerr << "ERROR::MOUSE::INITTEXTURE::could not load texture file.\n";
-    }
+	// Use TextureManager to get the texture instead of loading it directly
+	m_texture = TextureManager::getInstance().getTexture("Mouse.png");
 }

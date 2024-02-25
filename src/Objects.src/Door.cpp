@@ -8,8 +8,6 @@ Door::Door()
 }
 
 void Door::initTexture() {
-    if (!this->m_texture.loadFromFile("Door.png")) {
-        // Error handling
-        std::cerr << "ERROR::DOOR::INITTEXTURE::Could not load texture file." << std::endl;
-    }
+    // Use TextureManager to get the texture instead of loading it directly
+    m_texture = TextureManager::getInstance().getTexture("Door.png");
 }
