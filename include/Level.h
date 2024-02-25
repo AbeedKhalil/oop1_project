@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Consts.h"
-#include "Objects.h"
 #include "Wall.h"
 #include "Cat.h"
 #include "Mouse.h"
