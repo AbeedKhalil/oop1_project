@@ -45,6 +45,17 @@ void Game::initLevel() {
 }
 
 void Game::displayStartupImage() {
+	// Load sound buffer and sound
+	sf::SoundBuffer intro;
+	if (!intro.loadFromFile("Intro.ogg")) {
+		std::cerr << "ERROR::GAME::Could not load startup sound\n";
+	}
+
+	sf::Sound sound;
+	sound.setBuffer(intro);
+
+	sound.play();
+
 	sf::Texture startupTexture1;
 	if (!startupTexture1.loadFromFile("Intro1.png")) {
 		std::cerr << "ERROR::GAME::Could not load startup image\n";
@@ -213,6 +224,29 @@ void Game::updateGameLogic()
 {
 	pollEvents();
 
+	// Music handling based on the game state
+	switch (m_gameState) {
+	case GameState::MainMenu:
+	case GameState::Help:
+		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
+			playBackgroundMusic("MainMenu.ogg");
+		}
+		m_backgroundMusic.stop();
+		break;
+
+	case GameState::InGame:
+		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
+			playBackgroundMusic("InGame.ogg");
+		}
+		break;
+
+	default:
+		if (m_backgroundMusic.getStatus() == sf::Music::Playing) {
+			m_backgroundMusic.stop();
+		}
+		break;
+	}
+
 	// Update based on game state
 	switch (m_gameState)
 	{
@@ -265,6 +299,16 @@ void Game::updateGameLogic()
 	    }
 	}
 }
+
+void Game::playBackgroundMusic(const std::string& filePath) {
+	if (!m_backgroundMusic.openFromFile(filePath)) {
+		std::cerr << "ERROR::GAME::Could not load background music file: " << filePath << "\n";
+		return;
+	}
+	m_backgroundMusic.setLoop(true); // Loop the music
+	m_backgroundMusic.play();
+}
+
 
 // Render all game elements
 void Game::render() {

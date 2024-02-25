@@ -15,6 +15,7 @@
 #include <chrono>
 #include <thread>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 // Constants for game settings
 constexpr int MAX_LEVELS = 4;
