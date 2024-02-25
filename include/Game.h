@@ -23,6 +23,7 @@ private:
     sf::Texture m_menuSheet;
     std::unique_ptr<Menu> m_menu;
     std::shared_ptr<Level> m_level;
+    sf::Music m_backgroundMusic;
 
     // Game control
     bool m_restartGame = false;
@@ -41,6 +42,7 @@ private:
 
     // Game logic
     void updateGameLogic();
+    void playBackgroundMusic(const std::string& filePath);
 
     // Rendering
     void render();
