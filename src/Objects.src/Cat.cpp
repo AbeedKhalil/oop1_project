@@ -65,8 +65,6 @@ void Cat::moveCat(std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mo
 
 void Cat::initTexture()
 {
-    if (!m_texture.loadFromFile("SmartCat.png")) {
-        // Error handling
-        std::cerr << "ERROR::CAT::Could not load texture file." << std::endl;
-    }
+    // Use TextureManager to get the texture instead of loading it directly
+    m_texture = TextureManager::getInstance().getTexture("SmartCat.png");
 }

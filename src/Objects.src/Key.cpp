@@ -7,8 +7,6 @@ Key::Key()
 }
 
 void Key::initTexture() {
-    if (!this->m_texture.loadFromFile("Key.png")) {
-        // Error handling
-        std::cerr << "ERROR::KEY::INITTEXTURE::Could not load texture file." << std::endl;
-    }
+    // Use TextureManager to get the texture instead of loading it directly
+    m_texture = TextureManager::getInstance().getTexture("Key.png");
 }
