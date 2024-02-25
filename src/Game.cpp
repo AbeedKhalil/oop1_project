@@ -1,7 +1,7 @@
 #include "Game.h"
 
 // Initialize window and game components
-Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0) {
+Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0) {
 
 	initWindow();
 	displayStartupImage();
@@ -39,7 +39,7 @@ void Game::initTileSheet() {
 // Initialize the level
 void Game::initLevel() {
 	m_level.reset();
-	m_level = std::make_unique<Level>(*m_window);
+	m_level = std::make_shared<Level>(*m_window);
 	m_level->loadFromFile();
 	receiveObjectsFromLevel();
 }
@@ -126,43 +126,59 @@ void Game::run() {
 }
 
 void Game::receiveObjectsFromLevel() {
-	m_objects.clear();
+	m_sharedObjects.clear();
 	auto rawObjects = m_level->getRawObjectPointers();
 	for (auto* obj : rawObjects) {
-		m_objects.push_back(std::unique_ptr<Objects>(obj));
+		m_sharedObjects.push_back(std::shared_ptr<Objects>(obj));
 	}
 }
 
-bool Game::wouldCollide(Objects* obj, float moveX, float moveY) {
-	// Calculate the proposed new bounding box for obj after moving
-	sf::FloatRect nextPos(obj->getPosition().x + moveX, obj->getPosition().y + moveY, obj->getBounds().width + 1, obj->getBounds().height + 1);
+void Game::handleCollisions() {
+	Mouse* mouse = nullptr;
+	// Find the mouse object among the shared objects
+	for (auto& obj : m_sharedObjects) {
+		mouse = dynamic_cast<Mouse*>(obj.get());
+		if (mouse) break; // Stop searching once the mouse is found
+	}
 
-	// Check against all wall objects
-	for (auto& wallObj : m_objects) {
-		Wall* wall = dynamic_cast<Wall*>(wallObj.get());
-		if (wall) {
-			sf::FloatRect wallBounds = wall->getBounds();
-			if (nextPos.intersects(wallBounds)) {
-				return true; // Collision detected
+	if (!mouse) return; // If there's no mouse, no need to check for collisions
+
+	sf::FloatRect mouseBounds = mouse->getBounds();
+
+	for (auto& obj : m_sharedObjects) {
+		if (!obj->isVisible()) continue; // Skip invisible objects
+
+		Cheese* cheese = dynamic_cast<Cheese*>(obj.get());
+		Key* key = dynamic_cast<Key*>(obj.get());
+		RemoveCat* removeCat = dynamic_cast<RemoveCat*>(obj.get());
+		Door* door = dynamic_cast<Door*>(obj.get());
+
+		if (cheese && mouseBounds.intersects(cheese->getBounds())) {
+			cheese->setVisible(false); // Hide the cheese
+			m_level->updateCheeseNum(); // cheese-- from the cheese num on the level
+			m_scoreAmount += 10; // Increase the score
+		}
+		else if (key && mouseBounds.intersects(key->getBounds())) {
+			key->setVisible(false); // Hide the key
+			this->m_keyAmount++; // add one to the keys counter
+		}
+		else if (removeCat && mouseBounds.intersects(removeCat->getBounds())) {
+			removeCat->setVisible(false); // Hide the key
+			m_scoreAmount += 15; // Increase the score
+			// Logic to hide one cat
+			for (auto& catObj : m_sharedObjects) {
+				Cat* cat = dynamic_cast<Cat*>(catObj.get());
+				if (cat && cat->isVisible()) {
+					cat->setVisible(false); // Hide the cat
+					break; // Stop after hiding one cat
+				}
 			}
 		}
-	}
-	return false; // No collision detected
-}
-
-bool Game::checkCollisionWithWalls(Objects* obj, float moveX, float moveY) {
-	// Iterate over all objects to find walls
-	for (auto& wallObj : m_objects) {
-		Wall* wall = dynamic_cast<Wall*>(wallObj.get());
-		if (wall) {
-			// Here you'd implement the actual collision check
-			// For simplicity, assume a function exists that checks if obj moving by (moveX, moveY) would collide with wall
-			if (wouldCollide(obj, moveX, moveY)) {
-				return true; // Collision detected
-			}
+		else if (door && mouseBounds.intersects(door->getBounds()) && m_score.youHaveKey()) {
+			door->setVisible(false); // Hide the key
+			this->m_keyAmount--; // minus one from the keys counter
 		}
 	}
-	return false; // No collision detected
 }
 
 // Update input handling
@@ -188,116 +204,65 @@ void Game::updateInput()
 	}
 
 	// Move Mouse
-	for (auto& obj : m_objects) {
-		Mouse* mouse = dynamic_cast<Mouse*>(obj.get()); // Try to cast to Mouse*
-		if (mouse) // If it's a Mouse
-		{
-			// Check collision for X movement
-			if (!checkCollisionWithWalls(mouse, moveX, 0)) {
-				mouse->move(moveX, 0);
-			}
-			// Check collision for Y movement
-			if (!checkCollisionWithWalls(mouse, 0, moveY)) {
-				mouse->move(0, moveY);
-			}
-		}
-	}
+	Mouse* mouse = nullptr;
+	mouse->moveMouse(m_sharedObjects, moveX, moveY, m_score);
 }
 
 // Update game logic based on the current state
-void Game::updateGameLogic() {
+void Game::updateGameLogic() 
+{
 	pollEvents();
+
 	// Update based on game state
-	switch (m_gameState) {
-	case GameState::MainMenu:
+	switch (m_gameState)
 	{
-		this->m_menu->update(*this->m_window, m_gameState);
+	    case GameState::MainMenu:
+	    {
+		    this->m_menu->update(*this->m_window, m_gameState);
 
-		break;
-	}
-	case GameState::InGame:
-	{
-		updateInput();
+		    break;
+	    }
 
-		m_score.updateScore(m_scoreAmount);
+	    case GameState::InGame:
+	    {
+		    handleCollisions(); // Check and handle collisions
+		    updateInput();
+		    m_score.updateScore(m_scoreAmount, m_keyAmount);
 
-		Mouse* mouse = nullptr;
-		Cat* cat = nullptr;
+		    Mouse* mouse = nullptr;
+		    Cat* cat = nullptr;
 
-		// Correctly find the mouse and the cat
-		for (auto& obj : m_objects) {
-			if (!mouse) mouse = dynamic_cast<Mouse*>(obj.get());
-			if (!cat) cat = dynamic_cast<Cat*>(obj.get());
-			if (mouse && cat) break;
-		}
+		    // Correctly find the mouse and the cat
+		    for (auto& obj : m_sharedObjects) {
+			    if (!mouse) mouse = dynamic_cast<Mouse*>(obj.get());
+			    if (!cat) cat = dynamic_cast<Cat*>(obj.get());
+			    if (mouse && cat) break;
+		    }
 
-		// Find the mouse and the cat
-		if (mouse && cat) {
-			sf::Vector2f mousePos = mouse->getPosition();
-			sf::Vector2f catPos = cat->getPosition();
+		    // Find the mouse and the cat
+		    if (mouse && cat) {
+			    sf::Vector2f mousePos = mouse->getPosition();
+			    sf::Vector2f catPos = cat->getPosition();
+			    // move cat
+			    cat->moveCat(m_sharedObjects, mousePos, catPos, m_score);
+		    }
 
-			// Calculate normalized direction vector from cat to mouse
-			sf::Vector2f direction = mousePos - catPos;
-			float magnitude = std::hypot(direction.x, direction.y); // More precise than std::sqrt(x*x + y*y)
-			if (magnitude > 0) {
-				direction /= magnitude; // Normalize the direction vector
-			}
+		    // Check for level completion
+		    if (m_level->therIsNoCheese()) {
+			    initLevel();
+		    }
 
-			// Attempt direct movement towards the mouse
-			float moveX = direction.x * cat->getMovementSpeed();
-			float moveY = direction.y * cat->getMovementSpeed();
+ 		    // Update logic for all objects
+		    for (auto& obj : m_sharedObjects) {
+			    obj->update();
+		    }
+		    break;
+	    }
 
-			bool canMoveX = !checkCollisionWithWalls(cat, moveX, 0);
-			bool canMoveY = !checkCollisionWithWalls(cat, 0, moveY);
-
-			if (canMoveX) {
-				cat->move(moveX, 0);
-			}
-			else if (canMoveY) {
-				cat->move(0, moveY);
-			}
-			else {
-				// If direct movement is blocked, try alternative directions
-				for (const auto& altDir : alternativeDirections) {
-					if (!checkCollisionWithWalls(cat, altDir.x * cat->getMovementSpeed(), altDir.y * cat->getMovementSpeed())) {
-						cat->move(altDir.x * cat->getMovementSpeed(), altDir.y * cat->getMovementSpeed());
-						break;
-					}
-				}
-			}
-		}
-
-
-		if (mouse) {
-			for (auto& obj : m_objects) {
-				Cheese* cheese = dynamic_cast<Cheese*>(obj.get());
-				if (cheese) {
-					sf::FloatRect mouseBounds = mouse->getBounds();
-					sf::FloatRect cheeseBounds = cheese->getBounds();
-					if (mouseBounds.intersects(cheeseBounds) && obj->isVisible()) {
-						// Collision detected
-						obj->setVisible(false);
-						m_level->updateCheeseNum();
-						m_scoreAmount += 10;
-					}
-				}
-			}
-		}
-		// Check for level completion
-		if (m_level->therIsNoCheese()) {
-			initLevel();
-		}
-
-		// Update logic for all objects
-		for (auto& obj : m_objects) {
-			obj->update();
-		}
-		break;
-	}
-	case GameState::Help:
-	{
-		this->m_menu->update(*this->m_window, m_gameState);
-	}
+	    case GameState::Help:
+	    {
+		    this->m_menu->update(*this->m_window, m_gameState);
+	    }
 	}
 }
 
