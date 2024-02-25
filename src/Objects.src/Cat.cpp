@@ -1,6 +1,6 @@
 #include "Cat.h"
 
-Cat::Cat() : MovingObjects(2.f) // Initialize base class members with constructor initializer list
+Cat::Cat() : MovingObjects(1.f) // Initialize base class members with constructor initializer list
 {
     initTexture();
     initSprite();
@@ -43,8 +43,8 @@ void Cat::moveCat(std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mo
     }
 
     // Attempt movement with new velocity
-    bool canMoveX = !checkCollision(objects, this, velocity.x, 0, score);
-    bool canMoveY = !checkCollision(objects, this, 0, velocity.y, score);
+    bool canMoveX = !wouldCollide(objects, this, velocity.x, 0, score);
+    bool canMoveY = !wouldCollide(objects, this, 0, velocity.y, score);
 
     if (canMoveX) {
         this->move(velocity.x, 0);
@@ -55,7 +55,7 @@ void Cat::moveCat(std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mo
     else if (!canMoveX && !canMoveY) {
         // If direct movement is blocked, try alternative directions with current velocity
         for (const auto& altDir : alternativeDirections) {
-            if (!checkCollision(objects, this, altDir.x * velocity.x, altDir.y * velocity.y, score)) {
+            if (!wouldCollide(objects, this, altDir.x * velocity.x, altDir.y * velocity.y, score)) {
                 this->move(altDir.x * velocity.x, altDir.y * velocity.y);
                 break;
             }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Objects.h"
+#include "Score.h"
 
 class MovingObjects : public Objects
 {
@@ -15,8 +16,7 @@ public:
     virtual void move(float dirX, float dirY);
     float getMovementSpeed() const;
 
-	bool wouldCollide(std::vector<std::shared_ptr<Objects>> objects, Objects* obj, float moveX, float moveY, Score score);
-	bool checkCollision(std::vector<std::shared_ptr<Objects>> objects, Objects* obj, float moveX, float moveY, Score score);
+	bool wouldCollide(const std::vector<std::shared_ptr<Objects>>& objects, Objects* obj, float moveX, float moveY, const Score& score);
 
 protected:
     float m_movementSpeed;
