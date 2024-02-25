@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Score.h"
 #include "Menu.h"
 #include "Level.h"
 
@@ -14,16 +13,16 @@ private:
 
     // score
     Score m_score;
-    int m_scoreAmount;
+    int m_scoreAmount, m_keyAmount;
 
     // Game elements
-    std::vector<std::unique_ptr<Objects>> m_objects;
+    std::vector<std::shared_ptr<Objects>> m_sharedObjects;
     sf::Sprite m_spriteGame;
     sf::Sprite m_spriteMenu;
     sf::Texture m_tileSheet;
     sf::Texture m_menuSheet;
     std::unique_ptr<Menu> m_menu;
-    std::unique_ptr<Level> m_level;
+    std::shared_ptr<Level> m_level;
 
     // Game control
     bool m_restartGame = false;
@@ -38,23 +37,16 @@ private:
     // Event handling
     void pollEvents();
     void updateInput();
+    void handleCollisions();
 
     // Game logic
     void updateGameLogic();
-    std::vector<sf::Vector2f> alternativeDirections = {
-    {0, 1},  // Down
-    {1, 0},  // Right
-    {0, -1}, // Up
-    {-1, 0}  // Left
-    };
 
     // Rendering
     void render();
 
     // Utility
     void receiveObjectsFromLevel();
-    bool wouldCollide(Objects* obj, float moveX, float moveY);
-    bool checkCollisionWithWalls(Objects* obj, float moveX, float moveY);
 
 public:
     Game();
