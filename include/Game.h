@@ -15,6 +15,13 @@ private:
     Score m_score;
     int m_scoreAmount, m_keyAmount, m_livesAmount, m_levelNum;
 
+    // timer
+    sf::Clock clock;
+    float m_timeLimit; // Time limit for the level in seconds
+    float m_currentTime; // Current time left in the level
+    float m_totalGameTime;
+    float m_catPauseTime = 0.0f;
+
     // Game elements
     std::vector<std::shared_ptr<Objects>> m_sharedObjects;
     sf::Sprite m_spriteGame;

@@ -1,7 +1,7 @@
 #include "Game.h"
 
 // Initialize window and game components
-Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1) {
+Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1), m_totalGameTime(0) {
 
 	initWindow();
 	displayStartupImage();
@@ -42,6 +42,8 @@ void Game::initLevel() {
 	m_level = std::make_shared<Level>(*m_window);
 	m_level->loadFromFile();
 	receiveObjectsFromLevel();
+	m_timeLimit = 61.0f; // 1 min
+	m_currentTime = m_timeLimit;
 }
 
 void Game::displayStartupImage() {
@@ -64,12 +66,12 @@ void Game::displayStartupImage() {
 
 	sf::Sprite startupSprite1(startupTexture1);
 
-	sf::Clock clock;
+	sf::Clock time;
 	float fadeDuration = 3.f;
 	float alpha = 255;
 
 	while (alpha > 0) {
-		float deltaTime = clock.restart().asSeconds();
+		float deltaTime = time.restart().asSeconds();
 		alpha -= (255 / fadeDuration) * deltaTime;
 		if (alpha < 0) alpha = 0;
 
@@ -89,7 +91,7 @@ void Game::displayStartupImage() {
 	sf::Sprite startupSprite2(startupTexture2);
 	alpha = 255; // Reset alpha for the second image
 	while (alpha > 0) {
-		float deltaTime = clock.restart().asSeconds();
+		float deltaTime = time.restart().asSeconds();
 		alpha -= (255 / fadeDuration) * deltaTime;
 		if (alpha < 0) alpha = 0;
 
@@ -173,7 +175,7 @@ void Game::handleCollisions() {
 		if (cheese && mouseBounds.intersects(cheese->getBounds())) {
 			cheese->setVisible(false); // Hide the cheese
 			m_level->updateCheeseNum(); // cheese-- from the cheese num on the level
-			m_scoreAmount += 10; // Increase the score
+			m_scoreAmount += 5; // Increase the score
 		}
 		else if (key && mouseBounds.intersects(key->getBounds())) {
 			key->setVisible(false); // Hide the key
@@ -198,17 +200,19 @@ void Game::handleCollisions() {
 		else if (heart && mouseBounds.intersects(heart->getBounds())) {
 			heart->setVisible(false); // Hide the heart
 			this->m_livesAmount++; // add one to the heart counter
+			this->m_scoreAmount += 10; // add 10 to the score counter
 		}
 		else if (cat && mouseBounds.intersects(cat->getBounds())) {
 			//logic to restart the moving objects
 			this->m_livesAmount--; // minus one from the lives counter
+			this->m_scoreAmount -= 10; // minus 10 from the score counter
 		}
 		else if (puseCats && mouseBounds.intersects(puseCats->getBounds())) {
-			//logic to puse the cats
-			puseCats->setVisible(false); //hide the pusse icon 
+			puseCats->setVisible(false); // Hide the PuseCats item
+			m_catPauseTime = 10.0f; // Start the pause timer
 		}
 		else if (addTime && mouseBounds.intersects(addTime->getBounds())) {
-			//logic to add time
+			m_currentTime += 10.f; // add 10 sec to the timer
 			addTime->setVisible(false); //hide the add time icon 
 		}
 	}
@@ -283,7 +287,23 @@ void Game::updateGameLogic()
 	    {
 		    handleCollisions(); // Check and handle collisions
 		    updateInput();
-		    m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount, m_levelNum);
+
+			float deltaTime = clock.restart().asSeconds();
+			m_totalGameTime += deltaTime;
+		    m_currentTime -= deltaTime; // Decrement the current time by the elapsed time
+			if (m_currentTime <= 0) {
+				m_livesAmount--; // Decrease player's life by one
+				m_currentTime = m_timeLimit; // reset the timer
+				std::cout << "Time ends, You lost one Life\n";
+				m_scoreAmount -= 10;
+			}
+
+			if (m_catPauseTime > 0) {
+				m_catPauseTime -= deltaTime;
+				if (m_catPauseTime < 0) m_catPauseTime = 0;
+			}
+
+			m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount, m_levelNum, m_currentTime, m_totalGameTime);
 
 		    Mouse* mouse = nullptr;
 		    Cat* cat = nullptr;
@@ -296,18 +316,22 @@ void Game::updateGameLogic()
 		    }
 
 		    // Find the mouse and the cat
-		    if (mouse && cat) {
-			    sf::Vector2f mousePos = mouse->getPosition();
-			    sf::Vector2f catPos = cat->getPosition();
-			    // move cat
-			    cat->moveCat(m_sharedObjects, mousePos, catPos, m_score);
-		    }
+			if (mouse && cat) {
+				if (m_catPauseTime <= 0) { // Only move cats if pause time has elapsed
+					sf::Vector2f mousePos = mouse->getPosition();
+					sf::Vector2f catPos = cat->getPosition();
+					// Move cat
+					cat->moveCat(m_sharedObjects, mousePos, catPos, m_score);
+				}
+			}
+
 
 		    // Check for level completion
 		    if (m_level->therIsNoCheese()) {
 				m_levelNum++;
 				m_level->updateLevel();
 				receiveObjectsFromLevel();
+				m_currentTime = 61.f;
 		    }
 
  		    // Update logic for all objects
