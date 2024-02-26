@@ -13,7 +13,7 @@ private:
 
     // score
     Score m_score;
-    int m_scoreAmount, m_keyAmount;
+    int m_scoreAmount, m_keyAmount, m_livesAmount;
 
     // Game elements
     std::vector<std::shared_ptr<Objects>> m_sharedObjects;
