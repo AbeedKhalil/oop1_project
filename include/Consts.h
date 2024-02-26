@@ -30,6 +30,8 @@ constexpr char KEY = 'F';
 constexpr char MOUSE = '%';
 constexpr char CAT = '^';
 constexpr char HEART = 'H';
+constexpr char PUSECATS = 'P';
+constexpr char ADDTIME = '+';
 constexpr char PASS = ' ';
 
 //GameState enum to manage different game states
