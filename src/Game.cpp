@@ -1,7 +1,7 @@
 #include "Game.h"
 
 // Initialize window and game components
-Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0) {
+Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3) {
 
 	initWindow();
 	displayStartupImage();
@@ -138,11 +138,12 @@ void Game::run() {
 
 void Game::receiveObjectsFromLevel() {
 	m_sharedObjects.clear();
-	auto rawObjects = m_level->getRawObjectPointers();
-	for (auto* obj : rawObjects) {
-		m_sharedObjects.push_back(std::shared_ptr<Objects>(obj));
+	auto objects = m_level->getSharedObjectPointers(); // Assume this method returns std::vector<std::shared_ptr<Objects>>
+	for (const auto& obj : objects) {
+		m_sharedObjects.push_back(obj); // Directly use shared_ptr without creating a new one
 	}
 }
+
 
 void Game::handleCollisions() {
 	Mouse* mouse = nullptr;
@@ -159,10 +160,12 @@ void Game::handleCollisions() {
 	for (auto& obj : m_sharedObjects) {
 		if (!obj->isVisible()) continue; // Skip invisible objects
 
+		Cat* cat = dynamic_cast<Cat*>(obj.get());
 		Cheese* cheese = dynamic_cast<Cheese*>(obj.get());
 		Key* key = dynamic_cast<Key*>(obj.get());
 		RemoveCat* removeCat = dynamic_cast<RemoveCat*>(obj.get());
 		Door* door = dynamic_cast<Door*>(obj.get());
+		Heart* heart = dynamic_cast<Heart*>(obj.get());
 
 		if (cheese && mouseBounds.intersects(cheese->getBounds())) {
 			cheese->setVisible(false); // Hide the cheese
@@ -178,9 +181,9 @@ void Game::handleCollisions() {
 			m_scoreAmount += 15; // Increase the score
 			// Logic to hide one cat
 			for (auto& catObj : m_sharedObjects) {
-				Cat* cat = dynamic_cast<Cat*>(catObj.get());
-				if (cat && cat->isVisible()) {
-					cat->setVisible(false); // Hide the cat
+				Cat* cato = dynamic_cast<Cat*>(catObj.get());
+				if (cato && cato->isVisible()) {
+					cato->setVisible(false); // Hide the cat
 					break; // Stop after hiding one cat
 				}
 			}
@@ -188,6 +191,14 @@ void Game::handleCollisions() {
 		else if (door && mouseBounds.intersects(door->getBounds()) && m_score.youHaveKey()) {
 			door->setVisible(false); // Hide the key
 			this->m_keyAmount--; // minus one from the keys counter
+		}
+		else if (heart && mouseBounds.intersects(heart->getBounds())) {
+			heart->setVisible(false); // Hide the heart
+			this->m_livesAmount++; // add one to the heart counter
+		}
+		else if (cat && mouseBounds.intersects(cat->getBounds())) {
+			//logic to restart the moving objects
+			this->m_livesAmount--; // minus one from the lives counter
 		}
 	}
 }
@@ -261,7 +272,7 @@ void Game::updateGameLogic()
 	    {
 		    handleCollisions(); // Check and handle collisions
 		    updateInput();
-		    m_score.updateScore(m_scoreAmount, m_keyAmount);
+		    m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount);
 
 		    Mouse* mouse = nullptr;
 		    Cat* cat = nullptr;
@@ -283,7 +294,8 @@ void Game::updateGameLogic()
 
 		    // Check for level completion
 		    if (m_level->therIsNoCheese()) {
-			    initLevel();
+				m_level->updateLevel();
+				receiveObjectsFromLevel();
 		    }
 
  		    // Update logic for all objects
