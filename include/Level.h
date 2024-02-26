@@ -7,7 +7,9 @@
 #include "Mouse.h"
 #include "RemoveCat.h"
 #include "Door.h"
+#include "AddTime.h"
 #include "Key.h"
+#include "PuseCats.h"
 #include "Cheese.h"
 
 class Level {

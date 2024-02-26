@@ -1,7 +1,7 @@
 #include "Game.h"
 
 // Initialize window and game components
-Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3) {
+Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1) {
 
 	initWindow();
 	displayStartupImage();
@@ -138,7 +138,7 @@ void Game::run() {
 
 void Game::receiveObjectsFromLevel() {
 	m_sharedObjects.clear();
-	auto objects = m_level->getSharedObjectPointers(); // Assume this method returns std::vector<std::shared_ptr<Objects>>
+	auto objects = m_level->getSharedObjectPointers();
 	for (const auto& obj : objects) {
 		m_sharedObjects.push_back(obj); // Directly use shared_ptr without creating a new one
 	}
@@ -166,6 +166,9 @@ void Game::handleCollisions() {
 		RemoveCat* removeCat = dynamic_cast<RemoveCat*>(obj.get());
 		Door* door = dynamic_cast<Door*>(obj.get());
 		Heart* heart = dynamic_cast<Heart*>(obj.get());
+		PuseCats* puseCats = dynamic_cast<PuseCats*>(obj.get());
+		AddTime* addTime = dynamic_cast<AddTime*>(obj.get());
+
 
 		if (cheese && mouseBounds.intersects(cheese->getBounds())) {
 			cheese->setVisible(false); // Hide the cheese
@@ -199,6 +202,14 @@ void Game::handleCollisions() {
 		else if (cat && mouseBounds.intersects(cat->getBounds())) {
 			//logic to restart the moving objects
 			this->m_livesAmount--; // minus one from the lives counter
+		}
+		else if (puseCats && mouseBounds.intersects(puseCats->getBounds())) {
+			//logic to puse the cats
+			puseCats->setVisible(false); //hide the pusse icon 
+		}
+		else if (addTime && mouseBounds.intersects(addTime->getBounds())) {
+			//logic to add time
+			addTime->setVisible(false); //hide the add time icon 
 		}
 	}
 }
@@ -272,7 +283,7 @@ void Game::updateGameLogic()
 	    {
 		    handleCollisions(); // Check and handle collisions
 		    updateInput();
-		    m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount);
+		    m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount, m_levelNum);
 
 		    Mouse* mouse = nullptr;
 		    Cat* cat = nullptr;
@@ -294,6 +305,7 @@ void Game::updateGameLogic()
 
 		    // Check for level completion
 		    if (m_level->therIsNoCheese()) {
+				m_levelNum++;
 				m_level->updateLevel();
 				receiveObjectsFromLevel();
 		    }

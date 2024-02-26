@@ -33,6 +33,8 @@ void Level::loadFromFile()
             case HEART: obj = std::make_shared<Heart>(); break;
             case DOOR: obj = std::make_shared<Door>(); break;
             case KEY: obj = std::make_shared<Key>(); break;
+            case PUSECATS: obj = std::make_shared<PuseCats>(); break;
+            case ADDTIME: obj = std::make_shared<AddTime>(); break;
             case GIFT: obj = std::make_shared<RemoveCat>(); break;
             default: continue;
             }
