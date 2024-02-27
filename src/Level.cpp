@@ -8,8 +8,6 @@ void Level::loadFromFile()
     std::string filename = "Level" + std::to_string(m_level) + ".txt";
     std::ifstream file(filename);
     if (!file) {
-        std::cerr << "Error opening file " << filename << ". Loading default level instead." << std::endl;
-        // Consider loading a default level or taking other error recovery actions
         return;
     }
     std::string line;
@@ -46,10 +44,10 @@ void Level::loadFromFile()
     }
 }
 
-void Level::updateLevel()
+void Level::updateLevel(GameState& gameState)
 {
     if (m_level >= MAX_LEVELS) {
-        std::cout << "Congratulations! You've completed all levels." << std::endl;
+        gameState = GameState::Win;
     }
     else {
         m_level++;

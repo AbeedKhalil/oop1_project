@@ -23,7 +23,7 @@ public:
     Level(sf::RenderWindow& window);
     ~Level() = default; // Compiler-generated destructor is fine if we use smart pointers
     void loadFromFile();
-    void updateLevel();
+    void updateLevel(GameState& gameState);
     void updateCheeseNum();
     bool therIsNoCheese() const;
     std::vector<std::shared_ptr<Objects>> getSharedObjectPointers() const;
