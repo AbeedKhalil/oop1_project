@@ -38,7 +38,7 @@ constexpr char PASS = ' ';
 enum class GameState {
     MainMenu,
     InGame,
-    Help,
-    Paused,
-    Exiting
+    Win,
+    GameOver,
+    Help
 };

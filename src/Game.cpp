@@ -4,9 +4,10 @@
 Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1), m_totalGameTime(0) {
 
 	initWindow();
-	displayStartupImage();
+	//displayStartupImage();
 	initTileSheet();
 	initMenu();
+	initWinMenu();
 	initLevel();
 }
 
@@ -22,11 +23,17 @@ void Game::initMenu() {
 	m_menu = std::make_unique<Menu>();
 }
 
+void Game::initWinMenu()
+{
+	m_winMenu = std::make_unique<WinMenu>();
+}
+
 // Load and set up the tile sheet
 void Game::initTileSheet() {
 	if (!m_tileSheet.loadFromFile("TileSheet.png")) {
 		std::cerr << "ERROR::GAME::Could not load texture file: TileSheet.png\n";
 	}
+
 	m_spriteGame.setTexture(m_tileSheet);
 
 	if (!m_menuSheet.loadFromFile("MenuBackground.png")) {
@@ -34,6 +41,18 @@ void Game::initTileSheet() {
 	}
 
 	m_spriteMenu.setTexture(m_menuSheet);
+
+	if (!m_winSheet.loadFromFile("Win.png")) {
+		std::cerr << "ERROR::GAME::Could not load texture file: WinBackground.png\n";
+	}
+
+	m_spriteWin.setTexture(m_winSheet);
+
+	if (!m_gameOverSheet.loadFromFile("GameOver.png")) {
+		std::cerr << "ERROR::GAME::Could not load texture file: GameOver.png\n";
+	}
+
+	m_spriteGameOver.setTexture(m_gameOverSheet);
 }
 
 // Initialize the level
@@ -120,19 +139,22 @@ void Game::pollEvents() {
 				std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sleep to reduce CPU usage
 			}
 		}
+		if (event.type == sf::Event::MouseButtonPressed) {
+			if (m_gameState == GameState::GameOver) {
+				m_livesAmount = 3;
+				m_gameState = GameState::InGame;
+				initLevel();
+			}
+		}
 	}
 }
-
 // Main game loop
 void Game::run() {
 	while (m_window->isOpen()) {
 		pollEvents();
 		updateInput();
 
-		// Update game state and logic only if not paused
-		if (m_gameState != GameState::Paused) {
-			updateGameLogic();
-		}
+		updateGameLogic();
 
 		render();
 	}
@@ -145,7 +167,6 @@ void Game::receiveObjectsFromLevel() {
 		m_sharedObjects.push_back(obj); // Directly use shared_ptr without creating a new one
 	}
 }
-
 
 void Game::handleCollisions() {
 	Mouse* mouse = nullptr;
@@ -206,6 +227,8 @@ void Game::handleCollisions() {
 			//logic to restart the moving objects
 			this->m_livesAmount--; // minus one from the lives counter
 			this->m_scoreAmount -= 10; // minus 10 from the score counter
+			//temp logic
+			initLevel();
 		}
 		else if (puseCats && mouseBounds.intersects(puseCats->getBounds())) {
 			puseCats->setVisible(false); // Hide the PuseCats item
@@ -288,6 +311,11 @@ void Game::updateGameLogic()
 		    handleCollisions(); // Check and handle collisions
 		    updateInput();
 
+			if (m_livesAmount <= 0)
+			{
+				m_gameState = GameState::GameOver;
+			}
+
 			float deltaTime = clock.restart().asSeconds();
 			m_totalGameTime += deltaTime;
 		    m_currentTime -= deltaTime; // Decrement the current time by the elapsed time
@@ -296,6 +324,7 @@ void Game::updateGameLogic()
 				m_currentTime = m_timeLimit; // reset the timer
 				std::cout << "Time ends, You lost one Life\n";
 				m_scoreAmount -= 10;
+				initLevel();
 			}
 
 			if (m_catPauseTime > 0) {
@@ -329,7 +358,7 @@ void Game::updateGameLogic()
 		    // Check for level completion
 		    if (m_level->therIsNoCheese()) {
 				m_levelNum++;
-				m_level->updateLevel();
+				m_level->updateLevel(m_gameState);
 				receiveObjectsFromLevel();
 				m_currentTime = 61.f;
 		    }
@@ -344,7 +373,15 @@ void Game::updateGameLogic()
 	    case GameState::Help:
 	    {
 		    this->m_menu->update(*this->m_window, m_gameState);
+			break;
 	    }
+
+		case GameState::Win:
+		{
+			this->m_winMenu->update(*this->m_window, m_gameState);
+
+			break;
+		}
 	}
 }
 
@@ -376,6 +413,17 @@ void Game::render() {
 	case GameState::Help:
 	{
 		m_menu->showHelpWindow(*m_window, m_gameState);
+		break;
+	}
+	case GameState::Win:
+	{
+		m_window->draw(m_spriteWin);
+		m_winMenu->draw(*m_window);
+		break;
+	}
+	case GameState::GameOver:
+	{
+		m_window->draw(m_spriteGameOver);
 		break;
 	}
 	default:
