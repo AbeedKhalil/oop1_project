@@ -4,7 +4,7 @@
 Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1), m_totalGameTime(0) {
 
 	initWindow();
-	//displayStartupImage();
+	displayStartupImage();
 	initTileSheet();
 	initMenu();
 	initWinMenu();
@@ -273,28 +273,49 @@ void Game::updateGameLogic()
 {
 	pollEvents();
 
+    // Update this variable whenever the game state changes
+	static GameState lastGameState = GameState::None; // Initialize with an invalid state or a state that represents "no previous state"
+
 	// Music handling based on the game state
 	switch (m_gameState) {
 	case GameState::MainMenu:
 	case GameState::Help:
 		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
-			playBackgroundMusic("MainMenu.ogg");
+			playBackgroundMusic("MainMenu.ogg"); // Plays music for MainMenu and Help
 		}
-		m_backgroundMusic.stop();
+		m_backgroundMusic.setVolume(100);
 		break;
 
 	case GameState::InGame:
-		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
-			playBackgroundMusic("InGame.ogg");
+		if (lastGameState != m_gameState && m_backgroundMusic.getStatus() == sf::Music::Playing) {
+			m_backgroundMusic.stop(); // Stop the music if the state has changed and music is playing
 		}
+		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
+			playBackgroundMusic("InGame.ogg"); // Plays music for InGame
+		}
+		m_backgroundMusic.setVolume(10);
+		break;
+
+	case GameState::Win:
+		if (lastGameState != m_gameState && m_backgroundMusic.getStatus() == sf::Music::Playing) {
+			m_backgroundMusic.stop(); // Stop the music if the state has changed and music is playing
+		}
+		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
+			playBackgroundMusic("Win.ogg"); // Plays music for win
+		}
+		m_backgroundMusic.setVolume(100);
 		break;
 
 	default:
 		if (m_backgroundMusic.getStatus() == sf::Music::Playing) {
-			m_backgroundMusic.stop();
+			m_backgroundMusic.stop(); // Stops music if it's playing and the state doesn't require music
 		}
 		break;
 	}
+
+	// Update the lastGameState to the current state after handling the music
+	lastGameState = m_gameState;
+
 
 	// Update based on game state
 	switch (m_gameState)
@@ -379,6 +400,8 @@ void Game::updateGameLogic()
 		case GameState::Win:
 		{
 			this->m_winMenu->update(*this->m_window, m_gameState);
+			m_levelNum = 0;
+			initLevel();
 
 			break;
 		}

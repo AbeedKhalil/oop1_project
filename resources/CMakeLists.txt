@@ -6,6 +6,7 @@ endforeach()
 
 configure_file ("Sound/InGame.ogg" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Sound/MainMenu.ogg" ${CMAKE_BINARY_DIR} COPYONLY)
+configure_file ("Sound/Win.ogg" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Sound/Intro.ogg" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Textures/GameOver.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("Textures/Win.png" ${CMAKE_BINARY_DIR} COPYONLY)
