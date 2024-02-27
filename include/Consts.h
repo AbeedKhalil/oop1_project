@@ -40,5 +40,6 @@ enum class GameState {
     InGame,
     Win,
     GameOver,
-    Help
+    Help,
+    None
 };
