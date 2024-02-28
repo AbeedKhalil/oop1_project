@@ -4,7 +4,9 @@ Level::Level(sf::RenderWindow& window) : m_window(window), m_tileSize(TILE_SIZE)
 
 void Level::loadFromFile()
 {
-    m_map.clear();
+    m_static.clear();
+    m_moving.clear();
+    initialMovingPositions.clear();
     std::string filename = "Level" + std::to_string(m_level) + ".txt";
     std::ifstream file(filename);
     if (!file) {
@@ -14,7 +16,7 @@ void Level::loadFromFile()
     int y = 0;
     m_cheeseCount = 0;
     while (std::getline(file, line)) {
-        std::vector<std::shared_ptr<Objects>> row;
+        std::vector<std::shared_ptr<Objects>> rowStatic, rowMoving;
         for (int x = 0; x < static_cast<int>(line.length()); ++x) {
             char ch = line[x];
             std::shared_ptr<Objects> obj = nullptr;
@@ -36,11 +38,33 @@ void Level::loadFromFile()
             case GIFT: obj = std::make_shared<RemoveCat>(); break;
             default: continue;
             }
-            obj->setPosition(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize));
-            row.push_back(std::move(obj));
+            if (std::dynamic_pointer_cast<Mouse>(obj) != nullptr || std::dynamic_pointer_cast<Cat>(obj) != nullptr)
+            {
+                obj->setPosition(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize));
+                initialMovingPositions.push_back(obj->getPosition());
+                rowMoving.push_back(std::move(obj));
+            }
+            else
+            {
+                obj->setPosition(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize));
+                rowStatic.push_back(std::move(obj));
+            }
         }
-        m_map.push_back(std::move(row));
+        m_static.push_back(std::move(rowStatic));
+        m_moving.push_back(std::move(rowMoving));
         ++y;
+    }
+}
+
+void Level::resetMoving() {
+    size_t index = 0;
+    for (auto& row : m_moving) {
+        for (auto& obj : row) {
+            if (index < initialMovingPositions.size()) {
+                obj->setPosition(initialMovingPositions[index].x, initialMovingPositions[index].y);
+                index++;
+            }
+        }
     }
 }
 
@@ -71,23 +95,43 @@ bool Level::therIsNoCheese() const
     }
 }
 
-std::vector<std::shared_ptr<Objects>> Level::getSharedObjectPointers() const {
-    std::vector<std::shared_ptr<Objects>> allObjects;
-    for (const auto& row : m_map) {
+std::vector<std::shared_ptr<Objects>> Level::getStaticObjectPointers() const {
+    std::vector<std::shared_ptr<Objects>> staticObjects;
+    for (const auto& row : m_static) {
         for (const auto& obj : row) {
             if (obj) {
-                allObjects.push_back(obj);
+                staticObjects.push_back(obj);
             }
         }
     }
-    return allObjects;
+    return staticObjects;
+}
+
+std::vector<std::shared_ptr<Objects>> Level::getMovingObjectPointers() const {
+    std::vector<std::shared_ptr<Objects>> movingObjects;
+    for (const auto& row : m_moving) {
+        for (const auto& obj : row) {
+            if (obj) {
+                movingObjects.push_back(obj);
+            }
+        }
+    }
+    return movingObjects;
 }
 
 void Level::render() {
-    for (const auto& row : m_map) {
+    for (const auto& row : m_static) {
         for (const auto& obj : row) {
             if (obj && obj->isVisible()) {
                 obj->render(m_window);
+            }
+        }
+    }
+
+    for (const auto& row : m_moving) {
+        for (const auto& object : row) {
+            if (object && object->isVisible()) {
+                object->render(m_window);
             }
         }
     }

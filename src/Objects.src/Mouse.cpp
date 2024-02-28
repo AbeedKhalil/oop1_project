@@ -6,9 +6,9 @@ Mouse::Mouse() : MovingObjects(1.5f) // Initialize base class members with const
     initSprite();
 }
 
-void Mouse::moveMouse(std::vector<std::shared_ptr<Objects>> objects, float moveX, float moveY, Score score)
+void Mouse::moveMouse(std::vector<std::shared_ptr<Objects>> movingOjects, std::vector<std::shared_ptr<Objects>> objects, float moveX, float moveY, Score score)
 {
-	for (auto& obj : objects) {
+	for (auto& obj : movingOjects) {
 		Mouse* mouse = dynamic_cast<Mouse*>(obj.get()); // Try to cast to Mouse*
 		if (mouse) // If it's a Mouse
 		{

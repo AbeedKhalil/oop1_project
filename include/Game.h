@@ -24,7 +24,8 @@ private:
     float m_catPauseTime = 0.0f;
 
     // Game elements
-    std::vector<std::shared_ptr<Objects>> m_sharedObjects;
+    std::vector<std::shared_ptr<Objects>> m_staticObjects;
+    std::vector<std::shared_ptr<Objects>> m_movingObjects;
     sf::Sprite m_spriteGame;
     sf::Sprite m_spriteMenu;
     sf::Sprite m_spriteWin;
@@ -62,7 +63,8 @@ private:
     void render();
 
     // Utility
-    void receiveObjectsFromLevel();
+    void receiveStaticFromLevel();
+    void receiveMovingFromLevel();
 
 public:
     Game();

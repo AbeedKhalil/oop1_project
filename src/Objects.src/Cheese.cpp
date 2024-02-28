@@ -3,7 +3,7 @@
 Cheese::Cheese()
 {
     initTexture();
-    initSprite(); // Assuming initSprite() is suitable without modifications
+    initSprite();
 }
 
 void Cheese::initTexture() {
