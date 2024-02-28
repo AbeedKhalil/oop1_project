@@ -24,7 +24,7 @@ Score::Score() : m_score(0), m_keys(0), m_lives(3), m_level(1), m_totalGameTime(
 }
 
 // Update the score
-void Score::updateScore(int amount, int keys, int lives, int level, float currentTime, float gameTime) {
+void Score::updateScore(int amount, int keys, int lives, int level, float currentTime, float gameTime, bool timer) {
     m_score = amount;
     m_keys = keys;
     m_lives = lives;
@@ -38,7 +38,13 @@ void Score::updateScore(int amount, int keys, int lives, int level, float curren
     }
     m_totalGameTime = gameTime;
     // Update timer display
-    m_timerText.setString("Time Left: " + std::to_string(static_cast<int>(m_timeLeftForLevel)) + "s    Total Time: " + std::to_string(static_cast<int>(m_totalGameTime)) + "s");
+    if (timer) {
+        m_timerText.setString("Time Left: " + std::to_string(static_cast<int>(m_timeLeftForLevel)) + "s    Total Time: " + std::to_string(static_cast<int>(m_totalGameTime)) + "s");
+    }
+    else
+    {
+        m_timerText.setString("    Total Time : " + std::to_string(static_cast<int>(m_totalGameTime)) + "s");
+    }
 }
 
 bool Score::youHaveKey() const

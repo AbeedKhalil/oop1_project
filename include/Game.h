@@ -22,6 +22,7 @@ private:
     float m_currentTime; // Current time left in the level
     float m_totalGameTime;
     float m_catPauseTime = 0.0f;
+    bool m_timer = false;
 
     // Game elements
     std::vector<std::shared_ptr<Objects>> m_staticObjects;

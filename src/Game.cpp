@@ -155,7 +155,7 @@ void Game::run() {
 
 void Game::receiveStaticFromLevel() {
 	m_staticObjects.clear();
-	auto objects = m_level->getStaticObjectPointers();
+	auto objects = m_level->getStaticObjectPointers(m_timer);
 	for (const auto& obj : objects) {
 		m_staticObjects.push_back(obj); // Directly use shared_ptr without creating a new one
 	}
@@ -211,7 +211,7 @@ void Game::handleCollisions() {
 		if (cheese && mouseBounds.intersects(cheese->getBounds())) {
 			cheese->setVisible(false); // Hide the cheese
 			m_level->updateCheeseNum(); // cheese-- from the cheese num on the level
-			m_scoreAmount += 5; // Increase the score
+			m_scoreAmount += 10; // Increase the score
 		}
 		else if (key && mouseBounds.intersects(key->getBounds())) {
 			key->setVisible(false); // Hide the key
@@ -361,7 +361,7 @@ void Game::updateGameLogic()
 				if (m_catPauseTime < 0) m_catPauseTime = 0;
 			}
 
-			m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount, m_levelNum, m_currentTime, m_totalGameTime);
+			m_score.updateScore(m_scoreAmount, m_keyAmount, m_livesAmount, m_levelNum, m_currentTime, m_totalGameTime, m_timer);
 
 			// Correctly find the mouse
 			Mouse* mouse = nullptr;

@@ -4,6 +4,7 @@ Level::Level(sf::RenderWindow& window) : m_window(window), m_tileSize(TILE_SIZE)
 
 void Level::loadFromFile()
 {
+    m_timerOn = false;
     m_static.clear();
     m_moving.clear();
     initialMovingPositions.clear();
@@ -34,7 +35,12 @@ void Level::loadFromFile()
             case DOOR: obj = std::make_shared<Door>(); break;
             case KEY: obj = std::make_shared<Key>(); break;
             case PUSECATS: obj = std::make_shared<PuseCats>(); break;
-            case ADDTIME: obj = std::make_shared<AddTime>(); break;
+            case ADDTIME:
+            {
+                obj = std::make_shared<AddTime>();
+                m_timerOn = true;
+                break;
+            }
             case GIFT: obj = std::make_shared<RemoveCat>(); break;
             default: continue;
             }
@@ -95,7 +101,8 @@ bool Level::therIsNoCheese() const
     }
 }
 
-std::vector<std::shared_ptr<Objects>> Level::getStaticObjectPointers() const {
+std::vector<std::shared_ptr<Objects>> Level::getStaticObjectPointers(bool& timer) const {
+    timer = m_timerOn;
     std::vector<std::shared_ptr<Objects>> staticObjects;
     for (const auto& row : m_static) {
         for (const auto& obj : row) {
