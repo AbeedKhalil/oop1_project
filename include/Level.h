@@ -19,6 +19,7 @@ private:
     std::vector<std::vector<std::shared_ptr<Objects>>> m_moving;
     int m_tileSize, m_level;
     size_t m_cheeseCount;
+    bool m_timerOn = false;
 
 public:
     Level(sf::RenderWindow& window);
@@ -29,7 +30,7 @@ public:
     void updateCheeseNum();
     bool therIsNoCheese() const;
     std::vector<sf::Vector2f> initialMovingPositions;
-    std::vector<std::shared_ptr<Objects>> getStaticObjectPointers() const;
+    std::vector<std::shared_ptr<Objects>> getStaticObjectPointers(bool& timer) const;
     std::vector<std::shared_ptr<Objects>> getMovingObjectPointers() const;
     void render();
 };

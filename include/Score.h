@@ -14,7 +14,7 @@ private:
 
 public:
     Score();
-    void updateScore(int amount, int keys, int lives, int level, float currentTime, float gameTime);
+    void updateScore(int amount, int keys, int lives, int level, float currentTime, float gameTime, bool timer);
     bool youHaveKey() const;
     void render(sf::RenderWindow& window) const;
 };
