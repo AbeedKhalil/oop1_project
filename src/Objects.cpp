@@ -29,10 +29,6 @@ void Objects::setVisible(bool Visible)
     this->m_visible = Visible;
 }
 
-void Objects::update() {
-    // Empty implementation, meant to be overridden
-}
-
 void Objects::render(sf::RenderTarget& target) const {
     target.draw(m_sprite);
 }

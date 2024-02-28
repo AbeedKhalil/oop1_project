@@ -18,6 +18,11 @@ bool MovingObjects::wouldCollide(const std::vector<std::shared_ptr<Objects>>& ob
 {
     sf::FloatRect nextPos(obj->getPosition().x + moveX, obj->getPosition().y + moveY, obj->getBounds().width + 1, obj->getBounds().height + 1);
 
+    // Window boundary check
+    if (nextPos.left < 0 || nextPos.top < 30 || nextPos.left + nextPos.width > 960 || nextPos.top + nextPos.height > 840) {
+        return true; // Boundary collision detected
+    }
+
     for (const auto& object : objects) {
         if (auto wall = dynamic_cast<Wall*>(object.get())) {
             if (nextPos.intersects(wall->getBounds())) {

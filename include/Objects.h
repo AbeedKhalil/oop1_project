@@ -22,7 +22,6 @@ public:
     void setPosition(float posX, float posY);
     bool isVisible() const;
     void setVisible(bool Visible);
-    virtual void update();
     void render(sf::RenderTarget& target) const;
 
 protected:
