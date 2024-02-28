@@ -16,6 +16,7 @@ class Level {
 private:
     sf::RenderWindow& m_window;
     std::vector<std::vector<std::shared_ptr<Objects>>> m_map;
+    std::vector<std::vector<std::shared_ptr<Objects>>> m_movingObjects;
     int m_tileSize, m_level;
     size_t m_cheeseCount;
 
@@ -27,5 +28,6 @@ public:
     void updateCheeseNum();
     bool therIsNoCheese() const;
     std::vector<std::shared_ptr<Objects>> getSharedObjectPointers() const;
+    std::vector<std::shared_ptr<Objects>> getMovingSharedObjectPointers() const;
     void render();
 };

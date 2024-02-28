@@ -8,6 +8,8 @@ void Level::loadFromFile()
     std::string filename = "Level" + std::to_string(m_level) + ".txt";
     std::ifstream file(filename);
     if (!file) {
+        std::cerr << "Error opening file " << filename << ". Loading default level instead." << std::endl;
+        // Consider loading a default level or taking other error recovery actions
         return;
     }
     std::string line;
@@ -15,6 +17,7 @@ void Level::loadFromFile()
     m_cheeseCount = 0;
     while (std::getline(file, line)) {
         std::vector<std::shared_ptr<Objects>> row;
+        std::vector<std::shared_ptr<Objects>> rowMovingObjects;
         for (int x = 0; x < static_cast<int>(line.length()); ++x) {
             char ch = line[x];
             std::shared_ptr<Objects> obj = nullptr;
@@ -36,10 +39,19 @@ void Level::loadFromFile()
             case GIFT: obj = std::make_shared<RemoveCat>(); break;
             default: continue;
             }
-            obj->setPosition(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize));
-            row.push_back(std::move(obj));
+            if (std::dynamic_pointer_cast<Mouse>(obj) != nullptr || std::dynamic_pointer_cast<Cat>(obj) != nullptr)
+            {
+                obj->setPosition(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize));
+                rowMovingObjects.push_back(std::move(obj));
+            }
+            else
+            {
+                obj->setPosition(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize));
+                row.push_back(std::move(obj));
+            }
         }
         m_map.push_back(std::move(row));
+        m_movingObjects.push_back(std::move(rowMovingObjects));
         ++y;
     }
 }
@@ -83,8 +95,29 @@ std::vector<std::shared_ptr<Objects>> Level::getSharedObjectPointers() const {
     return allObjects;
 }
 
+std::vector<std::shared_ptr<Objects>> Level::getMovingSharedObjectPointers() const
+{
+    std::vector<std::shared_ptr<Objects>> movingObjects;
+    for (const auto& row : m_movingObjects) {
+        for (const auto& obj : row) {
+            if (obj) {
+                movingObjects.push_back(obj);
+            }
+        }
+    }
+    return movingObjects;
+}
+
 void Level::render() {
     for (const auto& row : m_map) {
+        for (const auto& obj : row) {
+            if (obj && obj->isVisible()) {
+                obj->render(m_window);
+            }
+        }
+    }
+
+    for (const auto& row : m_movingObjects) {
         for (const auto& obj : row) {
             if (obj && obj->isVisible()) {
                 obj->render(m_window);

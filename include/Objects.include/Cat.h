@@ -15,7 +15,7 @@ public:
     {-1, 0}  // Left
     };
 
-    void moveCat(std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mousePos, sf::Vector2f catPos, Score score);
+    void moveCat(const std::vector<std::shared_ptr<Objects>>& movingobjects, std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mousePos, sf::Vector2f catPos, Score score);
 
 protected:
     void initTexture() override;

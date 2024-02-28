@@ -6,7 +6,7 @@ Cat::Cat() : MovingObjects(1.f) // Initialize base class members with constructo
     initSprite();
 }
 
-void Cat::moveCat(std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mousePos, sf::Vector2f catPos, Score score)
+void Cat::moveCat(const std::vector<std::shared_ptr<Objects>>& movingobjects, std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mousePos, sf::Vector2f catPos, Score score)
 {
     static sf::Vector2f velocity(0, 0); // Current velocity of the cat
     const float accelerationRate = 0.1f; // Acceleration rate

@@ -4,7 +4,7 @@
 Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1), m_totalGameTime(0) {
 
 	initWindow();
-	displayStartupImage();
+	//displayStartupImage();
 	initTileSheet();
 	initMenu();
 	initWinMenu();
@@ -61,6 +61,7 @@ void Game::initLevel() {
 	m_level = std::make_shared<Level>(*m_window);
 	m_level->loadFromFile();
 	receiveObjectsFromLevel();
+	receiveMovingFromLevel();
 	m_timeLimit = 61.0f; // 1 min
 	m_currentTime = m_timeLimit;
 }
@@ -168,10 +169,18 @@ void Game::receiveObjectsFromLevel() {
 	}
 }
 
+void Game::receiveMovingFromLevel() {
+	m_sharedMovingObjects.clear();
+	auto movingObjects = m_level->getMovingSharedObjectPointers();
+	for (const auto& obj : movingObjects) {
+		m_sharedMovingObjects.push_back(obj); // Directly use shared_ptr without creating a new one
+	}
+}
+
 void Game::handleCollisions() {
 	Mouse* mouse = nullptr;
 	// Find the mouse object among the shared objects
-	for (auto& obj : m_sharedObjects) {
+	for (auto& obj : m_sharedMovingObjects) {
 		mouse = dynamic_cast<Mouse*>(obj.get());
 		if (mouse) break; // Stop searching once the mouse is found
 	}
@@ -180,10 +189,20 @@ void Game::handleCollisions() {
 
 	sf::FloatRect mouseBounds = mouse->getBounds();
 
+	for (auto& obj : m_sharedMovingObjects) {
+		Cat* cat = dynamic_cast<Cat*>(obj.get());
+		if (cat && mouseBounds.intersects(cat->getBounds())) {
+			//logic to restart the moving objects
+			this->m_livesAmount--; // minus one from the lives counter
+			this->m_scoreAmount -= 10; // minus 10 from the score counter
+			//temp logic
+			initLevel();
+		}
+	}
+
 	for (auto& obj : m_sharedObjects) {
 		if (!obj->isVisible()) continue; // Skip invisible objects
 
-		Cat* cat = dynamic_cast<Cat*>(obj.get());
 		Cheese* cheese = dynamic_cast<Cheese*>(obj.get());
 		Key* key = dynamic_cast<Key*>(obj.get());
 		RemoveCat* removeCat = dynamic_cast<RemoveCat*>(obj.get());
@@ -206,7 +225,7 @@ void Game::handleCollisions() {
 			removeCat->setVisible(false); // Hide the key
 			m_scoreAmount += 15; // Increase the score
 			// Logic to hide one cat
-			for (auto& catObj : m_sharedObjects) {
+			for (auto& catObj : m_sharedMovingObjects) {
 				Cat* cato = dynamic_cast<Cat*>(catObj.get());
 				if (cato && cato->isVisible()) {
 					cato->setVisible(false); // Hide the cat
@@ -223,13 +242,7 @@ void Game::handleCollisions() {
 			this->m_livesAmount++; // add one to the heart counter
 			this->m_scoreAmount += 10; // add 10 to the score counter
 		}
-		else if (cat && mouseBounds.intersects(cat->getBounds())) {
-			//logic to restart the moving objects
-			this->m_livesAmount--; // minus one from the lives counter
-			this->m_scoreAmount -= 10; // minus 10 from the score counter
-			//temp logic
-			initLevel();
-		}
+		
 		else if (puseCats && mouseBounds.intersects(puseCats->getBounds())) {
 			puseCats->setVisible(false); // Hide the PuseCats item
 			m_catPauseTime = 10.0f; // Start the pause timer
@@ -265,7 +278,7 @@ void Game::updateInput()
 
 	// Move Mouse
 	Mouse* mouse = nullptr;
-	mouse->moveMouse(m_sharedObjects, moveX, moveY, m_score);
+	mouse->moveMouse(m_sharedMovingObjects, m_sharedObjects, moveX, moveY, m_score);
 }
 
 // Update game logic based on the current state
@@ -359,7 +372,7 @@ void Game::updateGameLogic()
 		    Cat* cat = nullptr;
 
 		    // Correctly find the mouse and the cat
-		    for (auto& obj : m_sharedObjects) {
+		    for (auto& obj : m_sharedMovingObjects) {
 			    if (!mouse) mouse = dynamic_cast<Mouse*>(obj.get());
 			    if (!cat) cat = dynamic_cast<Cat*>(obj.get());
 			    if (mouse && cat) break;
@@ -371,24 +384,18 @@ void Game::updateGameLogic()
 					sf::Vector2f mousePos = mouse->getPosition();
 					sf::Vector2f catPos = cat->getPosition();
 					// Move cat
-					cat->moveCat(m_sharedObjects, mousePos, catPos, m_score);
+					cat->moveCat(m_sharedMovingObjects, m_sharedObjects, mousePos, catPos, m_score);
 				}
 			}
-
 
 		    // Check for level completion
 		    if (m_level->therIsNoCheese()) {
 				m_levelNum++;
 				m_level->updateLevel(m_gameState);
 				receiveObjectsFromLevel();
+				receiveMovingFromLevel();
 				m_currentTime = 61.f;
 		    }
-
- 		    // Update logic for all objects
-		    for (auto& obj : m_sharedObjects) {
-			    obj->update();
-		    }
-		    break;
 	    }
 
 	    case GameState::Help:

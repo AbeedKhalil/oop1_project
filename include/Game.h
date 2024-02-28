@@ -25,6 +25,7 @@ private:
 
     // Game elements
     std::vector<std::shared_ptr<Objects>> m_sharedObjects;
+    std::vector<std::shared_ptr<Objects>> m_sharedMovingObjects;
     sf::Sprite m_spriteGame;
     sf::Sprite m_spriteMenu;
     sf::Sprite m_spriteWin;
@@ -63,6 +64,8 @@ private:
 
     // Utility
     void receiveObjectsFromLevel();
+
+    void receiveMovingFromLevel();
 
 public:
     Game();

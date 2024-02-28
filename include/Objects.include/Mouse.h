@@ -9,7 +9,7 @@ public:
     Mouse();
     virtual ~Mouse() = default; // Use compiler-generated destructor
 
-    void moveMouse(std::vector<std::shared_ptr<Objects>> objects, float moveX, float moveY, Score score);
+    void moveMouse(const std::vector<std::shared_ptr<Objects>>& movingobjects, std::vector<std::shared_ptr<Objects>> objects, float moveX, float moveY, Score score);
 
 protected:
     void initTexture() override;
