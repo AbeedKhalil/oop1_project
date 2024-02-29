@@ -6,6 +6,7 @@ void Level::loadFromFile(int level)
 {
     m_level = level;
     m_timerOn = false;
+    m_catNum = 0;
     m_static.clear();
     m_moving.clear();
     initialMovingPositions.clear();
@@ -24,7 +25,12 @@ void Level::loadFromFile(int level)
             std::shared_ptr<Objects> obj = nullptr;
             switch (ch) {
             case WALL: obj = std::make_shared<Wall>(); break;
-            case CAT: obj = std::make_shared<Cat>(); break;
+            case CAT:
+            {
+                obj = std::make_shared<Cat>();
+                m_catNum++;
+                break;
+            }
             case CHEESE:
             {
                 obj = std::make_shared<Cheese>();

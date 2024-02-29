@@ -35,6 +35,27 @@ void Game::initAssets() {
 	m_spriteWin.setTexture(m_winSheet);
 	m_gameOverSheet = tm.getTexture("GameOver.png");
 	m_spriteGameOver.setTexture(m_gameOverSheet);
+
+	if (!m_catDies.loadFromFile("CatDies.ogg")) {
+		std::cerr << "ERROR::GAME::Could not load sound\n";
+	}
+	m_cat.setBuffer(m_catDies);
+	if (!m_pauseCats.loadFromFile("PuaseCats.ogg")) {
+		std::cerr << "ERROR::GAME::Could not load sound\n";
+	}
+	m_pause.setBuffer(m_pauseCats);
+	if (!m_timeEnds.loadFromFile("TimeEnds.ogg")) {
+		std::cerr << "ERROR::GAME::Could not load sound\n";
+	}
+	m_time.setBuffer(m_timeEnds);
+	if (!m_addTimer.loadFromFile("AddTime.ogg")) {
+		std::cerr << "ERROR::GAME::Could not load sound\n";
+	}
+	m_addTime.setBuffer(m_addTimer);
+	if (!m_unlockDoor.loadFromFile("DoorUnlock.ogg")) {
+		std::cerr << "ERROR::GAME::Could not load sound\n";
+	}
+	m_unlock.setBuffer(m_unlockDoor);
 }
 
 // Initialize the level
@@ -170,6 +191,7 @@ void Game::handleCollisions() {
 		// Check if it's a cat, it's visible, and there's an intersection
 		if (cat && cat->isVisible() && mouseBounds.intersects(cat->getBounds())) {
 			// Logic when mouse collides with a cat
+			m_time.play();
 			this->m_livesAmount--;
 			this->m_scoreAmount -= 10;
 			m_level->resetMoving();
@@ -199,8 +221,9 @@ void Game::handleCollisions() {
 			this->m_keyAmount++; // add one to the keys counter
 		}
 		else if (removeCat && mouseBounds.intersects(removeCat->getBounds())) {
+			m_cat.play();
 			removeCat->setVisible(false); // Hide the key
-			m_scoreAmount += 15; // Increase the score
+			m_scoreAmount += 5; // Increase the score
 			// Logic to hide one cat
 			for (auto& catObj : m_movingObjects) {
 				Cat* cato = dynamic_cast<Cat*>(catObj.get());
@@ -211,20 +234,26 @@ void Game::handleCollisions() {
 			}
 		}
 		else if (door && mouseBounds.intersects(door->getBounds()) && m_score.youHaveKey()) {
+			m_unlock.play();
 			door->setVisible(false); // Hide the key
+			m_scoreAmount += 5; // Increase the score
 			this->m_keyAmount--; // minus one from the keys counter
 		}
 		else if (heart && mouseBounds.intersects(heart->getBounds())) {
 			heart->setVisible(false); // Hide the heart
+			m_scoreAmount += 5; // Increase the score
 			this->m_livesAmount++; // add one to the heart counter
-			this->m_scoreAmount += 10; // add 10 to the score counter
 		}
 		else if (puseCats && mouseBounds.intersects(puseCats->getBounds())) {
+			m_pause.play();
 			puseCats->setVisible(false); // Hide the PuseCats item
+			m_scoreAmount += 5; // Increase the score
 			m_catPauseTime = 10.0f; // Start the pause timer
 		}
 		else if (addTime && mouseBounds.intersects(addTime->getBounds())) {
+			m_addTime.play();
 			m_currentTime += 10.f; // add 10 sec to the timer
+			m_scoreAmount += 5; // Increase the score
 			addTime->setVisible(false); //hide the add time icon 
 		}
 	}
@@ -340,6 +369,7 @@ void Game::updateGameLogic()
 			m_totalGameTime += deltaTime;
 		    m_currentTime -= deltaTime; // Decrement the current time by the elapsed time
 			if (m_currentTime <= 0 && m_timer) {
+				m_time.play();
 				m_livesAmount--; // Decrease player's life by one
 				m_currentTime = m_timeLimit; // reset the timer
 				m_keyAmount = 0; // all levels should start with 0 keys
@@ -380,6 +410,8 @@ void Game::updateGameLogic()
 		    if (m_level->therIsNoCheese()) {
 				m_levelNum++;
 				m_level->updateLevel(m_gameState);
+				m_scoreAmount += 20; // Increase the score
+				m_scoreAmount += (m_level->m_catNum * 5); // Increase the score
 				receiveObjectsFromLevel();
 				m_currentTime = 61.f;
 		    }

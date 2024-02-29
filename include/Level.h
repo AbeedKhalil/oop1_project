@@ -24,6 +24,9 @@ private:
 public:
     Level(sf::RenderWindow& window);
     ~Level() = default; // Compiler-generated destructor is fine if we use smart pointers
+
+    int m_catNum = 0;
+
     void loadFromFile(int level);
     void resetMoving();
     void updateLevel(GameState& gameState);
