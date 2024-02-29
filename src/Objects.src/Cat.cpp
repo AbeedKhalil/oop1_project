@@ -9,9 +9,9 @@ Cat::Cat() : MovingObjects(1.f) // Initialize base class members with constructo
 void Cat::moveCat(std::vector<std::shared_ptr<Objects>> objects, sf::Vector2f mousePos, sf::Vector2f catPos, Score score)
 {
     static sf::Vector2f velocity(0, 0); // Current velocity of the cat
-    const float accelerationRate = 0.1f; // Acceleration rate
+    const float accelerationRate = 0.2f; // Acceleration rate
     const float maxSpeed = getMovementSpeed(); // Max speed based on the cat's movement speed
-    const float decelerationRate = 0.1f; // Deceleration rate when changing direction or stopping
+    const float decelerationRate = 0.5f; // Deceleration rate when changing direction or stopping
 
     // Calculate normalized direction vector from cat to mouse
     sf::Vector2f direction = mousePos - catPos;

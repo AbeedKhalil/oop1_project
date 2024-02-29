@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.26)
 
 project (oop1_project)
-set (MY_AUTHORS "Abed && Roaa")
+set (MY_AUTHORS "Abed_Khalil-Roaa_Zoabi")
 
 include (cmake/CompilerSettings.cmake)
 

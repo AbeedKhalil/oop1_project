@@ -18,7 +18,7 @@
 #include <SFML/Audio.hpp>
 
 // Constants for game settings
-constexpr int MAX_LEVELS = 4;
+constexpr int MAX_LEVELS = 5;
 constexpr int TILE_SIZE = 60;
 
 // Game characters and elements

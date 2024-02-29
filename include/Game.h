@@ -27,17 +27,18 @@ private:
     // Game elements
     std::vector<std::shared_ptr<Objects>> m_staticObjects;
     std::vector<std::shared_ptr<Objects>> m_movingObjects;
-    sf::Sprite m_spriteGame;
-    sf::Sprite m_spriteMenu;
-    sf::Sprite m_spriteWin;
-    sf::Sprite m_spriteGameOver;
-    sf::Texture m_tileSheet;
-    sf::Texture m_menuSheet;
-    sf::Texture m_winSheet;
-    sf::Texture m_gameOverSheet;
     std::unique_ptr<Menu> m_menu;
     std::unique_ptr<WinMenu> m_winMenu;
     std::shared_ptr<Level> m_level;
+
+    // Texture and sprite assets
+    sf::Texture m_tileSheet, m_menuSheet, m_winSheet, m_gameOverSheet;
+    sf::Sprite m_spriteGame, m_spriteMenu, m_spriteWin, m_spriteGameOver;
+
+    // Sound assets
+    sf::SoundBuffer m_catDies, m_pauseCats, m_timeEnds, m_addTimer, m_unlockDoor;
+    sf::Sound m_cat, m_pause, m_time, m_addTime, m_unlock;
+
     sf::Music m_backgroundMusic;
 
     // Game control
