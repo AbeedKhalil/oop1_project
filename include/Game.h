@@ -45,9 +45,8 @@ private:
 
     // Initialization
     void initWindow();
-    void initMenu();
-    void initWinMenu();
-    void initTileSheet();
+    void initMenus();
+    void initAssets();
     void initLevel();
     void displayStartupImage();
 
@@ -64,8 +63,7 @@ private:
     void render();
 
     // Utility
-    void receiveStaticFromLevel();
-    void receiveMovingFromLevel();
+    void receiveObjectsFromLevel();
 
 public:
     Game();
