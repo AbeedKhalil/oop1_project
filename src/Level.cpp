@@ -2,8 +2,9 @@
 
 Level::Level(sf::RenderWindow& window) : m_window(window), m_tileSize(TILE_SIZE), m_level(1), m_cheeseCount(0) {}
 
-void Level::loadFromFile()
+void Level::loadFromFile(int level)
 {
+    m_level = level;
     m_timerOn = false;
     m_static.clear();
     m_moving.clear();
@@ -81,7 +82,7 @@ void Level::updateLevel(GameState& gameState)
     }
     else {
         m_level++;
-        loadFromFile(); // Attempt to load the new level
+        loadFromFile(m_level); // Attempt to load the new level
     }
 }
 

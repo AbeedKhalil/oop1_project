@@ -1,13 +1,13 @@
 #include "Game.h"
 
 // Initialize window and game components
-Game::Game() : m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0), m_livesAmount(3), m_levelNum(1), m_totalGameTime(0) {
-
+Game::Game()
+	: m_gameState(GameState::MainMenu), m_score(), m_scoreAmount(0), m_keyAmount(0),
+	m_livesAmount(3), m_levelNum(1), m_totalGameTime(0), m_timeLimit(61.0f), m_currentTime(m_timeLimit) {
 	initWindow();
-	//displayStartupImage();
-	initTileSheet();
-	initMenu();
-	initWinMenu();
+	displayStartupImage();
+	initAssets();
+	initMenus();
 	initLevel();
 }
 
@@ -18,32 +18,22 @@ void Game::initWindow() {
 	m_window->setVerticalSyncEnabled(false);
 }
 
-// Initialize the menu
-void Game::initMenu() {
+// Initialize the menus
+void Game::initMenus() {
 	m_menu = std::make_unique<Menu>();
-}
-
-void Game::initWinMenu()
-{
 	m_winMenu = std::make_unique<WinMenu>();
 }
 
-// Load and set up the tile sheet
-void Game::initTileSheet() {
-	m_tileSheet = TextureManager::getInstance().getTexture("TileSheet.png");
-
+// Load and set up the Backgrounds
+void Game::initAssets() {
+	auto& tm = TextureManager::getInstance();
+	m_tileSheet = tm.getTexture("TileSheet.png");
 	m_spriteGame.setTexture(m_tileSheet);
-
-	m_menuSheet = TextureManager::getInstance().getTexture("MenuBackground.png");
-
+	m_menuSheet = tm.getTexture("MenuBackground.png");
 	m_spriteMenu.setTexture(m_menuSheet);
-
-	m_winSheet = TextureManager::getInstance().getTexture("Win.png");
-
+	m_winSheet = tm.getTexture("Win.png");
 	m_spriteWin.setTexture(m_winSheet);
-
-	m_gameOverSheet = TextureManager::getInstance().getTexture("GameOver.png");
-
+	m_gameOverSheet = tm.getTexture("GameOver.png");
 	m_spriteGameOver.setTexture(m_gameOverSheet);
 }
 
@@ -51,13 +41,13 @@ void Game::initTileSheet() {
 void Game::initLevel() {
 	m_level.reset();
 	m_level = std::make_shared<Level>(*m_window);
-	m_level->loadFromFile();
-	receiveStaticFromLevel();
-	receiveMovingFromLevel();
+	m_level->loadFromFile(m_levelNum);
+	receiveObjectsFromLevel();
 	m_timeLimit = 61.0f; // 1 min
 	m_currentTime = m_timeLimit;
 }
 
+// the intro
 void Game::displayStartupImage() {
 	// Load sound buffer and sound
 	sf::SoundBuffer intro;
@@ -141,6 +131,7 @@ void Game::pollEvents() {
 		}
 	}
 }
+
 // Main game loop
 void Game::run() {
 	while (m_window->isOpen()) {
@@ -153,23 +144,13 @@ void Game::run() {
 	}
 }
 
-void Game::receiveStaticFromLevel() {
-	m_staticObjects.clear();
-	auto objects = m_level->getStaticObjectPointers(m_timer);
-	for (const auto& obj : objects) {
-		m_staticObjects.push_back(obj); // Directly use shared_ptr without creating a new one
-	}
+// recive the objects from the file
+void Game::receiveObjectsFromLevel() {
+	m_staticObjects = m_level->getStaticObjectPointers(m_timer);
+	m_movingObjects = m_level->getMovingObjectPointers();
 }
 
-void Game::receiveMovingFromLevel()
-{
-	m_movingObjects.clear();
-	auto objects = m_level->getMovingObjectPointers();
-	for (const auto& obj : objects) {
-		m_movingObjects.push_back(obj); // Directly use shared_ptr without creating a new one
-	}
-}
-
+// handle collisions
 void Game::handleCollisions() {
 	Mouse* mouse = nullptr;
 	// Find the mouse object among the moving objects
@@ -314,6 +295,16 @@ void Game::updateGameLogic()
 		m_backgroundMusic.setVolume(100);
 		break;
 
+	case GameState::GameOver:
+		if (lastGameState != m_gameState && m_backgroundMusic.getStatus() == sf::Music::Playing) {
+			m_backgroundMusic.stop(); // Stop the music if the state has changed and music is playing
+		}
+		if (m_backgroundMusic.getStatus() != sf::Music::Playing) {
+			playBackgroundMusic("GameOver.ogg"); // Plays music for win
+		}
+		m_backgroundMusic.setVolume(100);
+		break;
+
 	default:
 		if (m_backgroundMusic.getStatus() == sf::Music::Playing) {
 			m_backgroundMusic.stop(); // Stops music if it's playing and the state doesn't require music
@@ -348,11 +339,12 @@ void Game::updateGameLogic()
 			float deltaTime = clock.restart().asSeconds();
 			m_totalGameTime += deltaTime;
 		    m_currentTime -= deltaTime; // Decrement the current time by the elapsed time
-			if (m_currentTime <= 0) {
+			if (m_currentTime <= 0 && m_timer) {
 				m_livesAmount--; // Decrease player's life by one
 				m_currentTime = m_timeLimit; // reset the timer
-				std::cout << "Time ends, You lost one Life\n";
-				m_scoreAmount -= 10;
+				m_keyAmount = 0; // all levels should start with 0 keys
+				std::cout << "Time ends, You lost one Life\n" << "Score: -200\n" << "Restart Level: " << m_levelNum << std::endl << std::endl;
+				m_scoreAmount -= 200;
 				initLevel();
 			}
 
@@ -388,8 +380,7 @@ void Game::updateGameLogic()
 		    if (m_level->therIsNoCheese()) {
 				m_levelNum++;
 				m_level->updateLevel(m_gameState);
-				receiveStaticFromLevel();
-				receiveMovingFromLevel();
+				receiveObjectsFromLevel();
 				m_currentTime = 61.f;
 		    }
 			break;
@@ -412,6 +403,7 @@ void Game::updateGameLogic()
 	}
 }
 
+// to play the Background music
 void Game::playBackgroundMusic(const std::string& filePath) {
 	if (!m_backgroundMusic.openFromFile(filePath)) {
 		std::cerr << "ERROR::GAME::Could not load background music file: " << filePath << "\n";

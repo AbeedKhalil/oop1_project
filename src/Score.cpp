@@ -43,7 +43,7 @@ void Score::updateScore(int amount, int keys, int lives, int level, float curren
     }
     else
     {
-        m_timerText.setString("    Total Time : " + std::to_string(static_cast<int>(m_totalGameTime)) + "s");
+        m_timerText.setString("       Total Time : " + std::to_string(static_cast<int>(m_totalGameTime)) + "s");
     }
 }
 
